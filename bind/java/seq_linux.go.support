@@ -9,7 +9,7 @@ package main
 // files.
 
 //#cgo CFLAGS: -Werror
-//#cgo LDFLAGS: -llog
+//#cgo android LDFLAGS: -llog
 //#include <jni.h>
 //#include <stdint.h>
 //#include <stdlib.h>
