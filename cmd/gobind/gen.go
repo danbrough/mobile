@@ -113,6 +113,9 @@ func genPkg(lang string, p *types.Package, astFiles []*ast.File, allPkg []*types
 			copyFile(filepath.Join("src", "gobind", "seq_android.c"), filepath.Join(javaDir, "seq_android.c.support"))
 			copyFile(filepath.Join("src", "gobind", "seq_android.go"), filepath.Join(javaDir, "seq_android.go.support"))
 			copyFile(filepath.Join("src", "gobind", "seq_android.h"), filepath.Join(javaDir, "seq_android.h"))
+			copyFile(filepath.Join("src", "gobind", "seq_linux.c"), filepath.Join(javaDir, "seq_linux.c.support"))
+			copyFile(filepath.Join("src", "gobind", "seq_linux.go"), filepath.Join(javaDir, "seq_linux.go.support"))
+			copyFile(filepath.Join("src", "gobind", "seq_linux.h"), filepath.Join(javaDir, "seq_linux.h"))
 		}
 	case "go":
 		w, closer := writer(filepath.Join("src", "gobind", fname))
@@ -176,6 +179,9 @@ func genPkgH(w io.Writer, pname string) {
 
 #ifdef __GOBIND_ANDROID__
 #include "%[1]s_android.h"
+#endif
+#ifdef __GOBIND_LINUX__
+#include "%[1]s_linux.h"
 #endif
 #ifdef __GOBIND_DARWIN__
 #include "%[1]s_darwin.h"
