@@ -2,22 +2,19 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-#ifndef __GO_SEQ_LINUX_HDR__
-#define __GO_SEQ_LINUX_HDR__
+#ifndef __GO_SEQ_ANDROID_HDR__
+#define __GO_SEQ_ANDROID_HDR__
 
 #include <stdint.h>
-
+#include <android/log.h>
 // For abort()
 #include <stdlib.h>
 #include <jni.h>
 
-//#define LOG_INFO(...) __android_log_print(ANDROID_LOG_INFO, "go/Seq", __VA_ARGS__)
-#define LOG_INFO(...) printf( __VA_ARGS__)
-
-//__android_log_print(ANDROID_LOG_FATAL, "go/Seq", __VA_ARGS__); \
+#define LOG_INFO(...) __android_log_print(ANDROID_LOG_INFO, "go/Seq", __VA_ARGS__)
 #define LOG_FATAL(...)                                             \
   {                                                                \
-    printf( __VA_ARGS__); \
+    __android_log_print(ANDROID_LOG_FATAL, "go/Seq", __VA_ARGS__); \
     abort();                                                       \
   }
 
@@ -67,4 +64,4 @@ extern jmethodID go_seq_get_static_method_id(jclass clazz, const char *name, con
 extern jmethodID go_seq_get_method_id(jclass clazz, const char *name, const char *sig);
 extern int go_seq_isinstanceof(jint refnum, jclass clazz);
 
-#endif // __GO_SEQ_LINUX_HDR__
+#endif // __GO_SEQ_ANDROID_HDR__
