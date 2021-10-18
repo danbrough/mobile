@@ -1598,7 +1598,7 @@ func (g *JavaGen) GenJava() error {
 	g.Indent()
 	g.Printf("static {\n")
 	g.Indent()
-	g.Printf("Seq.touch(); // for loading the native library\n")
+	g.Printf("System.out.println(\"Java: calling Seq.touch()\");\nSeq.touch();\nSystem.out.println(\"Java: Seq.touch() done\"); // for loading the native library\n")
 	if g.Pkg != nil {
 		for _, p := range g.Pkg.Imports() {
 			if g.validPkg(p) {
@@ -1606,7 +1606,7 @@ func (g *JavaGen) GenJava() error {
 			}
 		}
 	}
-	g.Printf("_init();\n")
+	g.Printf("System.out.println(\"Java: calling _init()\");_init();System.out.println(\"Java: _init() done.\");\n")
 	g.Outdent()
 	g.Printf("}\n\n")
 	g.Printf("private %s() {} // uninstantiable\n\n", g.className())
