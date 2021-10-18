@@ -4,18 +4,19 @@
 
 package java // import "golang.org/x/mobile/bind/java"
 
-
 //
 //#include <jni.h>
 import "C"
 
 import (
-	"unsafe"
+  "golang.org/x/mobile/dan"
+  "unsafe"
 
-	"golang.org/x/mobile/internal/mobileinit"
+  "golang.org/x/mobile/internal/mobileinit"
 )
 
 //export setContext
 func setContext(vm *C.JavaVM, ctx C.jobject) {
-	mobileinit.SetCurrentContext(unsafe.Pointer(vm), uintptr(ctx))
+  dan.DanLog.Info("setContext()")
+  mobileinit.SetCurrentContext(unsafe.Pointer(vm), uintptr(ctx))
 }

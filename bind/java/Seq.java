@@ -4,7 +4,6 @@
 
 package go;
 
-import android.content.Context;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
@@ -34,15 +33,21 @@ public class Seq {
 	private static final GoRefQueue goRefQueue = new GoRefQueue();
 
 	static {
+		System.out.println("#java calling System.loadLibrary(\"gojni\");");
 		System.loadLibrary("gojni");
+		System.out.println("#java calling init();");
 		init();
+		System.out.println("#java calling Universe.touch();");
 		Universe.touch();
+		System.out.println("#java Seq init complete;");
 	}
 
+/*
 	// setContext sets the context in the go-library to be used in RunOnJvm.
 	public static void setContext(Context context) {
 		setContext((java.lang.Object)context);
 	}
+*/
 
 	private static native void init();
 

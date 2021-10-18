@@ -8,6 +8,7 @@
 
 JNIEXPORT void JNICALL
 Java_go_Seq_setContext(JNIEnv* env, jclass clazz, jobject ctx) {
+    printf("Java_go_Seq_setContext()\n");
 	JavaVM* vm;
 	if ((*env)->GetJavaVM(env, &vm) != 0) {
 		printf("failed to get JavaVM");
