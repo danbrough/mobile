@@ -7,119 +7,121 @@ package main
 //go:generate gomobile help documentation doc.go
 
 import (
-	"bufio"
-	"bytes"
-	"errors"
-	"flag"
-	"fmt"
-	"html/template"
-	"io"
-	"io/ioutil"
-	"log"
-	"os"
-	"os/exec"
-	"unicode"
-	"unicode/utf8"
+  "bufio"
+  "bytes"
+  "errors"
+  "flag"
+  "fmt"
+  dan "golang.org/x/mobile/dan"
+  "html/template"
+  "io"
+  "io/ioutil"
+  "log"
+  "os"
+  "os/exec"
+  "unicode"
+  "unicode/utf8"
 )
 
 var (
-	gomobileName = "gomobile"
-	goVersionOut = []byte(nil)
+  gomobileName = "gomobile"
+  goVersionOut = []byte(nil)
 )
 
 func printUsage(w io.Writer) {
-	bufw := bufio.NewWriter(w)
-	if err := usageTmpl.Execute(bufw, commands); err != nil {
-		panic(err)
-	}
-	bufw.Flush()
+  bufw := bufio.NewWriter(w)
+  if err := usageTmpl.Execute(bufw, commands); err != nil {
+    panic(err)
+  }
+  bufw.Flush()
 }
 
 func main() {
-	gomobileName = os.Args[0]
-	flag.Usage = func() {
-		printUsage(os.Stderr)
-		os.Exit(2)
-	}
-	flag.Parse()
-	log.SetFlags(0)
+  dan.DanLog.Info("main()")
+  gomobileName = os.Args[0]
+  flag.Usage = func() {
+    printUsage(os.Stderr)
+    os.Exit(2)
+  }
+  flag.Parse()
+  log.SetFlags(0)
 
-	args := flag.Args()
-	if len(args) < 1 {
-		flag.Usage()
-	}
+  args := flag.Args()
+  if len(args) < 1 {
+    flag.Usage()
+  }
 
-	if args[0] == "help" {
-		if len(args) == 3 && args[1] == "documentation" {
-			helpDocumentation(args[2])
-			return
-		}
-		help(args[1:])
-		return
-	}
+  if args[0] == "help" {
+    if len(args) == 3 && args[1] == "documentation" {
+      helpDocumentation(args[2])
+      return
+    }
+    help(args[1:])
+    return
+  }
 
-	if err := determineGoVersion(); err != nil {
-		fmt.Fprintf(os.Stderr, "%s: %v\n", gomobileName, err)
-		os.Exit(1)
-	}
+  if err := determineGoVersion(); err != nil {
+    fmt.Fprintf(os.Stderr, "%s: %v\n", gomobileName, err)
+    os.Exit(1)
+  }
 
-	for _, cmd := range commands {
-		if cmd.Name == args[0] {
-			cmd.flag.Usage = func() {
-				cmd.usage()
-				os.Exit(1)
-			}
-			cmd.flag.Parse(args[1:])
-			if err := cmd.run(cmd); err != nil {
-				msg := err.Error()
-				if msg != "" {
-					fmt.Fprintf(os.Stderr, "%s: %v\n", os.Args[0], err)
-				}
-				os.Exit(1)
-			}
-			return
-		}
-	}
-	fmt.Fprintf(os.Stderr, "%s: unknown subcommand %q\nRun 'gomobile help' for usage.\n", os.Args[0], args[0])
-	os.Exit(2)
+  for _, cmd := range commands {
+    if cmd.Name == args[0] {
+      cmd.flag.Usage = func() {
+        cmd.usage()
+        os.Exit(1)
+      }
+      cmd.flag.Parse(args[1:])
+      if err := cmd.run(cmd); err != nil {
+        msg := err.Error()
+        if msg != "" {
+          fmt.Fprintf(os.Stderr, "%s: %v\n", os.Args[0], err)
+        }
+        os.Exit(1)
+      }
+      return
+    }
+  }
+  fmt.Fprintf(os.Stderr, "%s: unknown subcommand %q\nRun 'gomobile help' for usage.\n", os.Args[0], args[0])
+  os.Exit(2)
 }
 
 func determineGoVersion() error {
-	goVersionOut, err := exec.Command("go", "version").CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("'go version' failed: %v, %s", err, goVersionOut)
-	}
-	var minor int
-	if _, err := fmt.Sscanf(string(goVersionOut), "go version go1.%d", &minor); err != nil {
-		// Ignore unknown versions; it's probably a devel version.
-		return nil
-	}
-	if minor < 16 {
-		return errors.New("Go 1.16 or newer is required")
-	}
-	return nil
+  goVersionOut, err := exec.Command("go", "version").CombinedOutput()
+  if err != nil {
+    return fmt.Errorf("'go version' failed: %v, %s", err, goVersionOut)
+  }
+  var minor int
+  if _, err := fmt.Sscanf(string(goVersionOut), "go version go1.%d", &minor); err != nil {
+    // Ignore unknown versions; it's probably a devel version.
+    return nil
+  }
+  if minor < 16 {
+    return errors.New("Go 1.16 or newer is required")
+  }
+  return nil
 }
 
 func help(args []string) {
-	if len(args) == 0 {
-		printUsage(os.Stdout)
-		return // succeeded at helping
-	}
-	if len(args) != 1 {
-		fmt.Fprintf(os.Stderr, "usage: %s help command\n\nToo many arguments given.\n", gomobileName)
-		os.Exit(2) // failed to help
-	}
+  if len(args) == 0 {
+    printUsage(os.Stdout)
+    return // succeeded at helping
+  }
+  if len(args) != 1 {
+    fmt.Fprintf(os.Stderr, "usage: %s help command\n\nToo many arguments given.\n", gomobileName)
+    os.Exit(2) // failed to help
+  }
 
-	arg := args[0]
-	for _, cmd := range commands {
-		if cmd.Name == arg {
-			cmd.usage()
-			return // succeeded at helping
-		}
-	}
+  arg := args[0]
+  for _, cmd := range commands {
+    if cmd.Name == arg {
+      cmd.usage()
+      return // succeeded at helping
+    }
+  }
 
-	fmt.Fprintf(os.Stderr, "Unknown help topic %#q.  Run '%s help'.\n", arg, gomobileName)
-	os.Exit(2)
+  fmt.Fprintf(os.Stderr, "Unknown help topic %#q.  Run '%s help'.\n", arg, gomobileName)
+  os.Exit(2)
 }
 
 const documentationHeader = `// Copyright 2015 The Go Authors.  All rights reserved.
@@ -130,59 +132,59 @@ const documentationHeader = `// Copyright 2015 The Go Authors.  All rights reser
 `
 
 func helpDocumentation(path string) {
-	w := new(bytes.Buffer)
-	w.WriteString(documentationHeader)
-	w.WriteString("\n/*\n")
-	if err := usageTmpl.Execute(w, commands); err != nil {
-		log.Fatal(err)
-	}
+  w := new(bytes.Buffer)
+  w.WriteString(documentationHeader)
+  w.WriteString("\n/*\n")
+  if err := usageTmpl.Execute(w, commands); err != nil {
+    log.Fatal(err)
+  }
 
-	for _, cmd := range commands {
-		r, rlen := utf8.DecodeRuneInString(cmd.Short)
-		w.WriteString("\n\n")
-		w.WriteRune(unicode.ToUpper(r))
-		w.WriteString(cmd.Short[rlen:])
-		w.WriteString("\n\nUsage:\n\n\tgomobile " + cmd.Name)
-		if cmd.Usage != "" {
-			w.WriteRune(' ')
-			w.WriteString(cmd.Usage)
-		}
-		w.WriteRune('\n')
-		w.WriteString(cmd.Long)
-	}
+  for _, cmd := range commands {
+    r, rlen := utf8.DecodeRuneInString(cmd.Short)
+    w.WriteString("\n\n")
+    w.WriteRune(unicode.ToUpper(r))
+    w.WriteString(cmd.Short[rlen:])
+    w.WriteString("\n\nUsage:\n\n\tgomobile " + cmd.Name)
+    if cmd.Usage != "" {
+      w.WriteRune(' ')
+      w.WriteString(cmd.Usage)
+    }
+    w.WriteRune('\n')
+    w.WriteString(cmd.Long)
+  }
 
-	w.WriteString("*/\npackage main // import \"golang.org/x/mobile/cmd/gomobile\"\n")
+  w.WriteString("*/\npackage main // import \"golang.org/x/mobile/cmd/gomobile\"\n")
 
-	if err := ioutil.WriteFile(path, w.Bytes(), 0666); err != nil {
-		log.Fatal(err)
-	}
+  if err := ioutil.WriteFile(path, w.Bytes(), 0666); err != nil {
+    log.Fatal(err)
+  }
 }
 
 var commands = []*command{
-	// TODO(crawshaw): cmdRun
-	cmdBind,
-	cmdBuild,
-	cmdClean,
-	cmdInit,
-	cmdInstall,
-	cmdVersion,
+  // TODO(crawshaw): cmdRun
+  cmdBind,
+  cmdBuild,
+  cmdClean,
+  cmdInit,
+  cmdInstall,
+  cmdVersion,
 }
 
 type command struct {
-	run   func(*command) error
-	flag  flag.FlagSet
-	Name  string
-	Usage string
-	Short string
-	Long  string
+  run   func(*command) error
+  flag  flag.FlagSet
+  Name  string
+  Usage string
+  Short string
+  Long  string
 }
 
 func (cmd *command) usage() {
-	fmt.Fprintf(os.Stdout, "usage: %s %s %s\n%s", gomobileName, cmd.Name, cmd.Usage, cmd.Long)
+  fmt.Fprintf(os.Stdout, "usage: %s %s %s\n%s", gomobileName, cmd.Name, cmd.Usage, cmd.Long)
 }
 
 var usageTmpl = template.Must(template.New("usage").Parse(
-	`Gomobile is a tool for building and running mobile apps written in Go.
+  `Gomobile is a tool for building and running mobile apps written in Go.
 
 To install:
 

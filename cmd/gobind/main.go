@@ -38,6 +38,7 @@ var usage = `The Gobind tool generates Java language bindings for Go.
 For usage details, see doc.go.`
 
 func main() {
+
 	flag.Parse()
 
 	run()

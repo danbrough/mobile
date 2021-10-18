@@ -5,27 +5,28 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io"
-	"io/ioutil"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"strings"
+  "bytes"
+  "encoding/json"
+  "errors"
+  "fmt"
+  "golang.org/x/mobile/dan"
+  "io"
+  "io/ioutil"
+  "os"
+  "os/exec"
+  "path/filepath"
+  "strings"
 
-	"golang.org/x/mod/modfile"
-	"golang.org/x/tools/go/packages"
+  "golang.org/x/mod/modfile"
+  "golang.org/x/tools/go/packages"
 )
 
 var cmdBind = &command{
-	run:   runBind,
-	Name:  "bind",
-	Usage: "[-target android|" + strings.Join(applePlatforms, "|") + "] [-bootclasspath <path>] [-classpath <path>] [-o output] [build flags] [package]",
-	Short: "build a library for Android and iOS",
-	Long: `
+  run:   runBind,
+  Name:  "bind",
+  Usage: "[-target android|" + strings.Join(applePlatforms, "|") + "] [-bootclasspath <path>] [-classpath <path>] [-o output] [build flags] [package]",
+  Short: "build a library for Android and iOS",
+  Long: `
 Bind generates language bindings for the package named by the import
 path, and compiles a library for the named target system.
 
@@ -68,256 +69,259 @@ are shared with the build command. For documentation, see 'go help build'.
 }
 
 func runBind(cmd *command) error {
-	cleanup, err := buildEnvInit()
-	if err != nil {
-		return err
-	}
-	defer cleanup()
+  cleanup, err := buildEnvInit()
+  if err != nil {
+    return err
+  }
+  defer cleanup()
 
-	args := cmd.flag.Args()
+  args := cmd.flag.Args()
 
-	targets, err := parseBuildTarget(buildTarget)
-	if err != nil {
-		return fmt.Errorf(`invalid -target=%q: %v`, buildTarget, err)
-	}
+  targets, err := parseBuildTarget(buildTarget)
+  if err != nil {
+    dan.DanLog.Error("parseBuildTarget failed. invalid -target=%q: %v", buildTarget, err)
+    return fmt.Errorf(`invalid -target=%q: %v`, buildTarget, err)
+  }
 
-	if isAndroidPlatform(targets[0].platform) {
-		if bindPrefix != "" {
-			return fmt.Errorf("-prefix is supported only for Apple targets")
-		}
-		if _, err := ndkRoot(); err != nil {
-			return err
-		}
-	} else {
-		if bindJavaPkg != "" {
-			return fmt.Errorf("-javapkg is supported only for android target")
-		}
-	}
+  if isAndroidPlatform(targets[0].platform) {
+    if bindPrefix != "" {
+      return fmt.Errorf("-prefix is supported only for Apple targets")
+    }
+    if _, err := ndkRoot(); err != nil {
+      return err
+    }
+  } else {
+    if bindJavaPkg != "" {
+      return fmt.Errorf("-javapkg is supported only for android target")
+    }
+  }
 
-	var gobind string
-	if !buildN {
-		gobind, err = exec.LookPath("gobind")
-		if err != nil {
-			return errors.New("gobind was not found. Please run gomobile init before trying again")
-		}
-	} else {
-		gobind = "gobind"
-	}
+  var gobind string
+  if !buildN {
+    gobind, err = exec.LookPath("gobind")
+    if err != nil {
+      return errors.New("gobind was not found. Please run gomobile init before trying again")
+    }
+  } else {
+    gobind = "gobind"
+  }
 
-	if len(args) == 0 {
-		args = append(args, ".")
-	}
+  if len(args) == 0 {
+    args = append(args, ".")
+  }
 
-	// TODO(ydnar): this should work, unless build tags affect loading a single package.
-	// Should we try to import packages with different build tags per platform?
-	pkgs, err := packages.Load(packagesConfig(targets[0]), args...)
-	if err != nil {
-		return err
-	}
+  // TODO(ydnar): this should work, unless build tags affect loading a single package.
+  // Should we try to import packages with different build tags per platform?
+  pkgs, err := packages.Load(packagesConfig(targets[0]), args...)
+  if err != nil {
+    return err
+  }
 
-	// check if any of the package is main
-	for _, pkg := range pkgs {
-		if pkg.Name == "main" {
-			return fmt.Errorf(`binding "main" package (%s) is not supported`, pkg.PkgPath)
-		}
-	}
+  // check if any of the package is main
+  for _, pkg := range pkgs {
+    if pkg.Name == "main" {
+      return fmt.Errorf(`binding "main" package (%s) is not supported`, pkg.PkgPath)
+    }
+  }
 
-	switch {
-	case isAndroidPlatform(targets[0].platform):
-		return goAndroidBind(gobind, pkgs, targets)
-	case isApplePlatform(targets[0].platform):
-		if !xcodeAvailable() {
-			return fmt.Errorf("-target=%q requires Xcode", buildTarget)
-		}
-		return goAppleBind(gobind, pkgs, targets)
-	default:
-		return fmt.Errorf(`invalid -target=%q`, buildTarget)
-	}
+  switch {
+  case isAndroidPlatform(targets[0].platform):
+    return goAndroidBind(gobind, pkgs, targets)
+  case isLinuxPlatform(targets[0].platform):
+    return goLinuxBind(gobind, pkgs, targets)
+  case isApplePlatform(targets[0].platform):
+    if !xcodeAvailable() {
+      return fmt.Errorf("-target=%q requires Xcode", buildTarget)
+    }
+    return goAppleBind(gobind, pkgs, targets)
+  default:
+    return fmt.Errorf(`invalid -target=%q`, buildTarget)
+  }
 }
 
 var (
-	bindPrefix        string // -prefix
-	bindJavaPkg       string // -javapkg
-	bindClasspath     string // -classpath
-	bindBootClasspath string // -bootclasspath
+  bindPrefix        string // -prefix
+  bindJavaPkg       string // -javapkg
+  bindClasspath     string // -classpath
+  bindBootClasspath string // -bootclasspath
 )
 
 func init() {
-	// bind command specific commands.
-	cmdBind.flag.StringVar(&bindJavaPkg, "javapkg", "",
-		"specifies custom Java package path prefix. Valid only with -target=android.")
-	cmdBind.flag.StringVar(&bindPrefix, "prefix", "",
-		"custom Objective-C name prefix. Valid only with -target=ios.")
-	cmdBind.flag.StringVar(&bindClasspath, "classpath", "", "The classpath for imported Java classes. Valid only with -target=android.")
-	cmdBind.flag.StringVar(&bindBootClasspath, "bootclasspath", "", "The bootstrap classpath for imported Java classes. Valid only with -target=android.")
+  // bind command specific commands.
+  cmdBind.flag.StringVar(&bindJavaPkg, "javapkg", "",
+    "specifies custom Java package path prefix. Valid only with -target=android.")
+  cmdBind.flag.StringVar(&bindPrefix, "prefix", "",
+    "custom Objective-C name prefix. Valid only with -target=ios.")
+  cmdBind.flag.StringVar(&bindClasspath, "classpath", "", "The classpath for imported Java classes. Valid only with -target=android.")
+  cmdBind.flag.StringVar(&bindBootClasspath, "bootclasspath", "", "The bootstrap classpath for imported Java classes. Valid only with -target=android.")
 }
 
 func bootClasspath() (string, error) {
-	if bindBootClasspath != "" {
-		return bindBootClasspath, nil
-	}
-	apiPath, err := androidAPIPath()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(apiPath, "android.jar"), nil
+  if bindBootClasspath != "" {
+    return bindBootClasspath, nil
+  }
+  apiPath, err := androidAPIPath()
+  if err != nil {
+    return "", err
+  }
+  return filepath.Join(apiPath, "android.jar"), nil
 }
 
 func copyFile(dst, src string) error {
-	if buildX {
-		printcmd("cp %s %s", src, dst)
-	}
-	return writeFile(dst, func(w io.Writer) error {
-		if buildN {
-			return nil
-		}
-		f, err := os.Open(src)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
+  if buildX {
+    printcmd("cp %s %s", src, dst)
+  }
+  return writeFile(dst, func(w io.Writer) error {
+    if buildN {
+      return nil
+    }
+    f, err := os.Open(src)
+    if err != nil {
+      return err
+    }
+    defer f.Close()
 
-		if _, err := io.Copy(w, f); err != nil {
-			return fmt.Errorf("cp %s %s failed: %v", src, dst, err)
-		}
-		return nil
-	})
+    if _, err := io.Copy(w, f); err != nil {
+      return fmt.Errorf("cp %s %s failed: %v", src, dst, err)
+    }
+    return nil
+  })
 }
 
 func writeFile(filename string, generate func(io.Writer) error) error {
-	if buildV {
-		fmt.Fprintf(os.Stderr, "write %s\n", filename)
-	}
+  if buildV {
+    fmt.Fprintf(os.Stderr, "write %s\n", filename)
+  }
 
-	if err := mkdir(filepath.Dir(filename)); err != nil {
-		return err
-	}
+  if err := mkdir(filepath.Dir(filename)); err != nil {
+    return err
+  }
 
-	if buildN {
-		return generate(ioutil.Discard)
-	}
+  if buildN {
+    return generate(ioutil.Discard)
+  }
 
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if cerr := f.Close(); err == nil {
-			err = cerr
-		}
-	}()
+  f, err := os.Create(filename)
+  if err != nil {
+    return err
+  }
+  defer func() {
+    if cerr := f.Close(); err == nil {
+      err = cerr
+    }
+  }()
 
-	return generate(f)
+  return generate(f)
 }
 
 func packagesConfig(t targetInfo) *packages.Config {
-	config := &packages.Config{}
-	// Add CGO_ENABLED=1 explicitly since Cgo is disabled when GOOS is different from host OS.
-	config.Env = append(os.Environ(), "GOARCH="+t.arch, "GOOS="+platformOS(t.platform), "CGO_ENABLED=1")
-	tags := append(buildTags[:], platformTags(t.platform)...)
+  config := &packages.Config{}
+  // Add CGO_ENABLED=1 explicitly since Cgo is disabled when GOOS is different from host OS.
+  config.Env = append(os.Environ(), "GOARCH="+t.arch, "GOOS="+platformOS(t.platform), "CGO_ENABLED=1")
+  tags := append(buildTags[:], platformTags(t.platform)...)
 
-	if len(tags) > 0 {
-		config.BuildFlags = []string{"-tags=" + strings.Join(tags, ",")}
-	}
-	return config
+  if len(tags) > 0 {
+    config.BuildFlags = []string{"-tags=" + strings.Join(tags, ",")}
+  }
+  return config
 }
 
 // getModuleVersions returns a module information at the directory src.
 func getModuleVersions(targetPlatform string, targetArch string, src string) (*modfile.File, error) {
-	cmd := exec.Command("go", "list")
-	cmd.Env = append(os.Environ(), "GOOS="+platformOS(targetPlatform), "GOARCH="+targetArch)
+  cmd := exec.Command("go", "list")
+  cmd.Env = append(os.Environ(), "GOOS="+platformOS(targetPlatform), "GOARCH="+targetArch)
 
-	tags := append(buildTags[:], platformTags(targetPlatform)...)
+  tags := append(buildTags[:], platformTags(targetPlatform)...)
 
-	// TODO(hyangah): probably we don't need to add all the dependencies.
-	cmd.Args = append(cmd.Args, "-m", "-json", "-tags="+strings.Join(tags, ","), "all")
-	cmd.Dir = src
+  // TODO(hyangah): probably we don't need to add all the dependencies.
+  cmd.Args = append(cmd.Args, "-m", "-json", "-tags="+strings.Join(tags, ","), "all")
+  cmd.Dir = src
 
-	output, err := cmd.Output()
-	if err != nil {
-		// Module information is not available at src.
-		return nil, nil
-	}
+  output, err := cmd.Output()
+  if err != nil {
+    // Module information is not available at src.
+    return nil, nil
+  }
 
-	type Module struct {
-		Main    bool
-		Path    string
-		Version string
-		Dir     string
-		Replace *Module
-	}
+  type Module struct {
+    Main    bool
+    Path    string
+    Version string
+    Dir     string
+    Replace *Module
+  }
 
-	f := &modfile.File{}
-	f.AddModuleStmt("gobind")
-	e := json.NewDecoder(bytes.NewReader(output))
-	for {
-		var mod *Module
-		err := e.Decode(&mod)
-		if err != nil && err != io.EOF {
-			return nil, err
-		}
-		if mod != nil {
-			if mod.Replace != nil {
-				p, v := mod.Replace.Path, mod.Replace.Version
-				if modfile.IsDirectoryPath(p) {
-					// replaced by a local directory
-					p = mod.Replace.Dir
-				}
-				f.AddReplace(mod.Path, mod.Version, p, v)
-			} else {
-				// When the version part is empty, the module is local and mod.Dir represents the location.
-				if v := mod.Version; v == "" {
-					f.AddReplace(mod.Path, mod.Version, mod.Dir, "")
-				} else {
-					f.AddRequire(mod.Path, v)
-				}
-			}
-		}
-		if err == io.EOF {
-			break
-		}
-	}
-	return f, nil
+  f := &modfile.File{}
+  f.AddModuleStmt("gobind")
+  e := json.NewDecoder(bytes.NewReader(output))
+  for {
+    var mod *Module
+    err := e.Decode(&mod)
+    if err != nil && err != io.EOF {
+      return nil, err
+    }
+    if mod != nil {
+      if mod.Replace != nil {
+        p, v := mod.Replace.Path, mod.Replace.Version
+        if modfile.IsDirectoryPath(p) {
+          // replaced by a local directory
+          p = mod.Replace.Dir
+        }
+        f.AddReplace(mod.Path, mod.Version, p, v)
+      } else {
+        // When the version part is empty, the module is local and mod.Dir represents the location.
+        if v := mod.Version; v == "" {
+          f.AddReplace(mod.Path, mod.Version, mod.Dir, "")
+        } else {
+          f.AddRequire(mod.Path, v)
+        }
+      }
+    }
+    if err == io.EOF {
+      break
+    }
+  }
+  return f, nil
 }
 
 // writeGoMod writes go.mod file at $WORK/src when Go modules are used.
 func writeGoMod(dir, targetPlatform, targetArch string) error {
-	m, err := areGoModulesUsed()
-	if err != nil {
-		return err
-	}
-	// If Go modules are not used, go.mod should not be created because the dependencies might not be compatible with Go modules.
-	if !m {
-		return nil
-	}
+  m, err := areGoModulesUsed()
+  if err != nil {
+    return err
+  }
+  // If Go modules are not used, go.mod should not be created because the dependencies might not be compatible with Go modules.
+  if !m {
+    return nil
+  }
 
-	return writeFile(filepath.Join(dir, "src", "go.mod"), func(w io.Writer) error {
-		f, err := getModuleVersions(targetPlatform, targetArch, ".")
-		if err != nil {
-			return err
-		}
-		if f == nil {
-			return nil
-		}
-		bs, err := f.Format()
-		if err != nil {
-			return err
-		}
-		if _, err := w.Write(bs); err != nil {
-			return err
-		}
-		return nil
-	})
+  return writeFile(filepath.Join(dir, "src", "go.mod"), func(w io.Writer) error {
+    f, err := getModuleVersions(targetPlatform, targetArch, ".")
+    if err != nil {
+      return err
+    }
+    if f == nil {
+      return nil
+    }
+    bs, err := f.Format()
+    if err != nil {
+      return err
+    }
+    if _, err := w.Write(bs); err != nil {
+      return err
+    }
+    return nil
+  })
 }
 
 func areGoModulesUsed() (bool, error) {
-	out, err := exec.Command("go", "env", "GOMOD").Output()
-	if err != nil {
-		return false, err
-	}
-	outstr := strings.TrimSpace(string(out))
-	if outstr == "" {
-		return false, nil
-	}
-	return true, nil
+  out, err := exec.Command("go", "env", "GOMOD").Output()
+  if err != nil {
+    return false, err
+  }
+  outstr := strings.TrimSpace(string(out))
+  if outstr == "" {
+    return false, nil
+  }
+  return true, nil
 }
