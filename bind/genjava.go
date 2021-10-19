@@ -8,14 +8,14 @@ import (
   "fmt"
   "go/constant"
   "go/types"
-  "golang.org/x/mobile/dan"
+  "github.com/danbrough/mobile/dan"
   "html"
   "math"
   "reflect"
   "regexp"
   "strings"
 
-  "golang.org/x/mobile/internal/importers/java"
+  "github.com/danbrough/mobile/internal/importers/java"
 )
 
 // TODO(crawshaw): disallow basic android java type names in exported symbols.

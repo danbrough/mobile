@@ -3,7 +3,7 @@ package main
 import (
   "errors"
   "fmt"
-  "golang.org/x/mobile/dan"
+  "github.com/danbrough/mobile/dan"
   "io/ioutil"
   "os"
   "os/exec"

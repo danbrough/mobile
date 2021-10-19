@@ -2,10 +2,10 @@ module demos/hello
 
 go 1.17
 
-replace golang.org/x/mobile => ../../
+replace github.com/danbrough/mobile  => ../../
 
 require (
-	golang.org/x/mobile v0.0.0-20210924032853-1c027f395ef7 // indirect
+	github.com/danbrough/mobile v0.0.1-alpha05 // indirect
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
 	golang.org/x/tools v0.1.2 // indirect

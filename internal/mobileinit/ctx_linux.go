@@ -61,7 +61,7 @@ import "C"
 
 import (
 	"errors"
-	"golang.org/x/mobile/dan"
+	"github.com/danbrough/mobile/dan"
 	"runtime"
 	"unsafe"
 )

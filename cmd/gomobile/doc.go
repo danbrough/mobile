@@ -9,7 +9,7 @@ Gomobile is a tool for building and running mobile apps written in Go.
 
 To install:
 
-	$ go install golang.org/x/mobile/cmd/gomobile@latest
+	$ go install github.com/danbrough/mobile/cmd/gomobile@latest
 	$ gomobile init
 
 At least Go 1.16 is required.
@@ -173,4 +173,4 @@ Usage:
 
 Version prints versions of the gomobile binary and tools
 */
-package main // import "golang.org/x/mobile/cmd/gomobile"
+package main // import "github.com/danbrough/mobile/cmd/gomobile"

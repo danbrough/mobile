@@ -30,36 +30,36 @@ var tests = []struct {
 	{
 		name: "ObjC-Testpkg",
 		lang: "objc",
-		pkg:  "golang.org/x/mobile/bind/testdata/testpkg",
+		pkg:  "github.com/danbrough/mobile/bind/testdata/testpkg",
 	},
 	{
 		name: "Java-Testpkg",
 		lang: "java",
-		pkg:  "golang.org/x/mobile/bind/testdata/testpkg",
+		pkg:  "github.com/danbrough/mobile/bind/testdata/testpkg",
 	},
 	{
 		name: "Go-Testpkg",
 		lang: "go",
-		pkg:  "golang.org/x/mobile/bind/testdata/testpkg",
+		pkg:  "github.com/danbrough/mobile/bind/testdata/testpkg",
 	},
 	{
 		name:    "Java-Javapkg",
 		lang:    "java",
-		pkg:     "golang.org/x/mobile/bind/testdata/testpkg/javapkg",
+		pkg:     "github.com/danbrough/mobile/bind/testdata/testpkg/javapkg",
 		goos:    "android",
 		reverse: true,
 	},
 	{
 		name:    "Go-Javapkg",
 		lang:    "go",
-		pkg:     "golang.org/x/mobile/bind/testdata/testpkg/javapkg",
+		pkg:     "github.com/danbrough/mobile/bind/testdata/testpkg/javapkg",
 		goos:    "android",
 		reverse: true,
 	},
 	{
 		name: "Go-Cgopkg",
 		lang: "go,java,objc",
-		pkg:  "golang.org/x/mobile/bind/testdata/cgopkg",
+		pkg:  "github.com/danbrough/mobile/bind/testdata/cgopkg",
 		goos: "android",
 	},
 }
@@ -78,7 +78,7 @@ func testMain(m *testing.M) int {
 	bin.Close()
 	defer os.Remove(bin.Name())
 	if runtime.GOOS != "android" {
-		if out, err := exec.Command("go", "build", "-o", bin.Name(), "golang.org/x/mobile/cmd/gobind").CombinedOutput(); err != nil {
+		if out, err := exec.Command("go", "build", "-o", bin.Name(), "github.com/danbrough/mobile/cmd/gobind").CombinedOutput(); err != nil {
 			log.Fatalf("gobind build failed: %v: %s", err, out)
 		}
 		gobindBin = bin.Name()

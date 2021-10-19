@@ -9,7 +9,7 @@ import (
   "encoding/json"
   "errors"
   "fmt"
-  "golang.org/x/mobile/dan"
+  "github.com/danbrough/mobile/dan"
   "io"
   "io/ioutil"
   "os"

@@ -27,7 +27,7 @@ adb logcat GoLog:I *:S
 import "C"
 import (
   "bufio"
-  "golang.org/x/mobile/dan"
+  "github.com/danbrough/mobile/dan"
   "os"
   "runtime"
 )

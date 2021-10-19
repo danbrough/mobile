@@ -10,8 +10,7 @@ import (
   "bufio"
   "errors"
   "fmt"
-  "golang.org/x/mobile/dan"
-  _ "golang.org/x/mobile/dan"
+  "github.com/danbrough/mobile/dan"
   "golang.org/x/tools/go/packages"
   "io"
   "os"
@@ -172,8 +171,8 @@ func runBuildImpl(cmd *command) (*packages.Package, error) {
     }
   }
 
-  if !nmpkgs["golang.org/x/mobile/app"] {
-    return nil, fmt.Errorf(`%s does not import "golang.org/x/mobile/app"`, pkg.PkgPath)
+  if !nmpkgs["github.com/danbrough/mobile/app"] {
+    return nil, fmt.Errorf(`%s does not import "github.com/danbrough/mobile/app"`, pkg.PkgPath)
   }
 
   return pkg, nil
@@ -183,7 +182,7 @@ var nmRE = regexp.MustCompile(`[0-9a-f]{8} t _?(?:.*/vendor/)?(golang.org/x.*/[^
 
 func extractPkgs(nm string, path string) (map[string]bool, error) {
   if buildN {
-    return map[string]bool{"golang.org/x/mobile/app": true}, nil
+    return map[string]bool{"github.com/danbrough/mobile/app": true}, nil
   }
   r, w := io.Pipe()
   cmd := exec.Command(nm, path)

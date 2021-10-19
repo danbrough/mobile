@@ -2,21 +2,20 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package java // import "golang.org/x/mobile/bind/java"
+package java // import "github.com/danbrough/mobile/bind/java"
 
 //
 //#include <jni.h>
 import "C"
 
 import (
-  "golang.org/x/mobile/dan"
-  "unsafe"
-
-  "golang.org/x/mobile/internal/mobileinit"
+	"github.com/danbrough/mobile/dan"
+	"unsafe"
+	"github.com/danbrough/internal/mobileinit"
 )
 
 //export setContext
 func setContext(vm *C.JavaVM, ctx C.jobject) {
-  dan.DanLog.Info("setContext()")
-  mobileinit.SetCurrentContext(unsafe.Pointer(vm), uintptr(ctx))
+	dan.DanLog.Info("setContext()")
+	mobileinit.SetCurrentContext(unsafe.Pointer(vm), uintptr(ctx))
 }
