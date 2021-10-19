@@ -35,11 +35,11 @@ public class Seq {
 	static {
 		System.out.println("#java calling System.loadLibrary(\"gojni\");");
 		System.loadLibrary("gojni");
-		System.out.println("#java calling init();");
+		System.out.println("#java calling Seq.init();");
 		init();
-		System.out.println("#java calling Universe.touch();");
+		System.out.println("#Seq.init complete. calling Universe.touch();");
 		Universe.touch();
-		System.out.println("#java Seq init complete;");
+		System.out.println("#Universe.touch() complete;");
 	}
 
 /*

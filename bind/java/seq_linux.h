@@ -5,13 +5,13 @@
 #ifndef __GO_SEQ_ANDROID_HDR__
 #define __GO_SEQ_ANDROID_HDR__
 
-#include <stdint.h>
 #ifdef __GOBIND_ANDROID__
 #include <android/log.h>
 #endif
 // For abort()
 #include <stdlib.h>
 #include <jni.h>
+#include <stdint.h>
 
 #ifdef __GOBIND_ANDROID__
 #define LOG_INFO(...) __android_log_print(ANDROID_LOG_INFO, "go/Seq", __VA_ARGS__)
@@ -21,10 +21,10 @@
     abort();                                                       \
   }
 #else
-#define LOG_INFO(...) printf( __VA_ARGS__)
-#define LOG_FATAL(...)                                             \
+#define LOG_INFO(fmt,...) printf( "JNI: " fmt "\n",##__VA_ARGS__)
+#define LOG_FATAL(fmt,...)                                             \
   {                                                                \
-    printf( __VA_ARGS__); \
+    printf("JNI:FATAL:" fmt "\n",##__VA_ARGS__); \
     abort();                                                       \
   }
 #endif

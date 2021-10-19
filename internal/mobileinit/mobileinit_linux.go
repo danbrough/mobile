@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build linux && !android
+// +build linux,!android
+
 package mobileinit
 
 /*
@@ -16,20 +19,21 @@ adb logcat GoLog:I *:S
 // Unfortunately, logcat is line oriented, so we must buffer.
 
 /*
-
-
 #include <stdlib.h>
 #include <string.h>
 */
-import "C"
 
+
+import "C"
 import (
   "bufio"
   "golang.org/x/mobile/dan"
   "log"
   "os"
+  "runtime"
   "syscall"
 )
+
 
 var (
   ctag = C.CString("GoLog")
@@ -38,12 +42,11 @@ var (
   stderr, stdout *os.File
 )
 
+const isAndroid = runtime.GOOS == "android"
+
 type infoWriter struct{}
 
 func (infoWriter) Write(p []byte) (n int, err error) {
-  /*cstr := C.CString(string(p))
-  C.__android_log_write(C.ANDROID_LOG_INFO, ctag, cstr)
-  C.free(unsafe.Pointer(cstr))*/
   dan.DanLog.Info("%s: %s", ctag, string(p))
   return len(p), nil
 }
@@ -57,17 +60,44 @@ func lineLog(f *os.File, priority C.int) {
     if err != nil {
       str += " " + err.Error()
     }
-    /*cstr := C.CString(str)
-    C.__android_log_write(priority, ctag, cstr)
-    C.free(unsafe.Pointer(cstr))*/
+
     dan.DanLog.Debug("%s: %s", ctag, str)
+
     if err != nil {
       break
     }
   }
 }
 
+
+/*
+func (infoWriter) Write(p []byte) (n int, err error) {
+	cstr := C.CString(string(p))
+	C.__android_log_write(C.ANDROID_LOG_INFO, ctag, cstr)
+	C.free(unsafe.Pointer(cstr))
+	return len(p), nil
+}
+
+func lineLog(f *os.File, priority C.int) {
+	const logSize = 1024 // matches android/log.h.
+	r := bufio.NewReaderSize(f, logSize)
+	for {
+		line, _, err := r.ReadLine()
+		str := string(line)
+		if err != nil {
+			str += " " + err.Error()
+		}
+		cstr := C.CString(str)
+		C.__android_log_write(priority, ctag, cstr)
+		C.free(unsafe.Pointer(cstr))
+		if err != nil {
+			break
+		}
+	}
+}
+ */
 func init() {
+  dan.DanLog.Warn("init() GOOS:%s", runtime.GOOS)
   log.SetOutput(infoWriter{})
   // android logcat includes all of log.LstdFlags
   log.SetFlags(log.Flags() &^ log.LstdFlags)
