@@ -1,5 +1,13 @@
 # Go support for Mobile devices
 
+## Hacked to run on jvm.
+
+This fork of [GoMobile](https://pkg.go.dev/golang.org/x/mobile) has been modified to enable libraries to be built for the JVM  as well as android.
+
+It's currently working on linux (amd64 but arm64, arm, x86 should work also).
+
+
+
 [![Go Reference](https://pkg.go.dev/badge/golang.org/x/mobile.svg)](https://pkg.go.dev/golang.org/x/mobile)
 
 The Go mobile repository holds packages and build tools for using Go on mobile platforms.

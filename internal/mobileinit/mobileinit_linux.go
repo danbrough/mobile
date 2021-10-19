@@ -28,10 +28,8 @@ import "C"
 import (
   "bufio"
   "golang.org/x/mobile/dan"
-  "log"
   "os"
   "runtime"
-  "syscall"
 )
 
 
@@ -42,7 +40,6 @@ var (
   stderr, stdout *os.File
 )
 
-const isAndroid = runtime.GOOS == "android"
 
 type infoWriter struct{}
 
@@ -98,7 +95,7 @@ func lineLog(f *os.File, priority C.int) {
  */
 func init() {
   dan.DanLog.Warn("init() GOOS:%s", runtime.GOOS)
-  log.SetOutput(infoWriter{})
+/*  log.SetOutput(infoWriter{})
   // android logcat includes all of log.LstdFlags
   log.SetFlags(log.Flags() &^ log.LstdFlags)
 
@@ -122,5 +119,5 @@ func init() {
     panic(err)
   }
   //go lineLog(r, C.ANDROID_LOG_INFO)
-  go lineLog(r, 6)
+  go lineLog(r, 6)*/
 }
