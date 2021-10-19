@@ -12,7 +12,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	dan "golang.org/x/mobile/dan"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -37,7 +36,6 @@ func printUsage(w io.Writer) {
 }
 
 func main() {
-	dan.DanLog.Info("main()")
 	gomobileName = os.Args[0]
 	flag.Usage = func() {
 		printUsage(os.Stderr)
