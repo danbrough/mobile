@@ -21,7 +21,7 @@ static char* lockJNI(JavaVM *vm, uintptr_t* envp, int* attachedp) {
 	case JNI_OK:
 		break;
 	case JNI_EDETACHED:
-		if ((*vm)->AttachCurrentThread(vm, &env, 0) != 0) {
+		if ((*vm)->AttachCurrentThread(vm, (void**) &env, 0) != 0) {
 			return "cannot attach to JVM";
 		}
 		*attachedp = 1;

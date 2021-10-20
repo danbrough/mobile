@@ -17,7 +17,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-
 	"github.com/danbrough/mobile/internal/importers"
 	"github.com/danbrough/mobile/internal/importers/java"
 	"github.com/danbrough/mobile/internal/importers/objc"
