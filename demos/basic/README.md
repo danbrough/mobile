@@ -1,3 +1,7 @@
-# GoMobileJvm  basic demo 
+# GoMobileJvm  basic demo
 
-~~~~
+
+see [build.sh](build.sh)
+
+
+

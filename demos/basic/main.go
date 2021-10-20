@@ -1,6 +1,6 @@
 package main
 
-import "demos/hello/hello"
+import "demos/basic/hello"
 
 func main() {
   println(hello.GetMessage())
