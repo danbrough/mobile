@@ -1,6 +1,6 @@
 package main
 
-import "github.com/danbrough/demos/basic/hello"
+import "demos/basic/hello"
 
 func main() {
   println(hello.GetMessage())

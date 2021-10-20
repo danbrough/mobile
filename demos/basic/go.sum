@@ -1,8 +1,6 @@
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/danbrough/mobile v0.0.1-alpha11 h1:4z5ksJqeOjyqo77nJjvZ0W22QUpLrdvP62Re1SW399s=
-github.com/danbrough/mobile v0.0.1-alpha11/go.mod h1:VsKtr/mcc2hRWdyNUh768a5T7vSLphsDcpX3X1RJkuo=
-github.com/danbrough/mobile v0.0.1-alpha14 h1:+hQY2af44om29mziax44Qza0D/sO9wyY+7mR8xB+XtM=
-github.com/danbrough/mobile v0.0.1-alpha14/go.mod h1:VsKtr/mcc2hRWdyNUh768a5T7vSLphsDcpX3X1RJkuo=
+github.com/danbrough/mobile v0.0.1-alpha19 h1:wLWNt+XPrzRIMX1PXmI+595l8HXwqbZsrE1oJQ/L848=
+github.com/danbrough/mobile v0.0.1-alpha19/go.mod h1:VsKtr/mcc2hRWdyNUh768a5T7vSLphsDcpX3X1RJkuo=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
