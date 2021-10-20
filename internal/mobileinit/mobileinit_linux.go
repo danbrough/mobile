@@ -27,7 +27,6 @@ adb logcat GoLog:I *:S
 import "C"
 import (
   "bufio"
-  "github.com/danbrough/mobile/dan"
   "os"
   "runtime"
 )
@@ -44,7 +43,7 @@ var (
 type infoWriter struct{}
 
 func (infoWriter) Write(p []byte) (n int, err error) {
-  dan.DanLog.Info("%s: %s", ctag, string(p))
+  println("%s: %s", ctag, string(p))
   return len(p), nil
 }
 
@@ -58,7 +57,7 @@ func lineLog(f *os.File, priority C.int) {
       str += " " + err.Error()
     }
 
-    dan.DanLog.Debug("%s: %s", ctag, str)
+    println("%s: %s", ctag, str)
 
     if err != nil {
       break
@@ -94,7 +93,7 @@ func lineLog(f *os.File, priority C.int) {
 }
  */
 func init() {
-  dan.DanLog.Warn("init() GOOS:%s", runtime.GOOS)
+  println("init() GOOS:%s", runtime.GOOS)
 /*  log.SetOutput(infoWriter{})
   // android logcat includes all of log.LstdFlags
   log.SetFlags(log.Flags() &^ log.LstdFlags)

@@ -61,7 +61,6 @@ import "C"
 
 import (
 	"errors"
-	"github.com/danbrough/mobile/dan"
 	"runtime"
 	"unsafe"
 )
@@ -81,7 +80,6 @@ var currentCtx C.jobject
 // current JavaVM instance (vm) and android.context.Context object (ctx).
 // The android.context.Context object must be a global reference.
 func SetCurrentContext(vm unsafe.Pointer, ctx uintptr) {
-	dan.DanLog.Info("SetCurrentContext()")
 	currentVM = (*C.JavaVM)(vm)
 	currentCtx = (C.jobject)(ctx)
 }
@@ -95,7 +93,6 @@ func SetCurrentContext(vm unsafe.Pointer, ctx uintptr) {
 // env, the current JNIEnv*, and
 // ctx, a jobject representing the global android.context.Context.
 func RunOnJVM(fn func(vm, env, ctx uintptr) error) error {
-	dan.DanLog.Info("RunOnJVM()")
 	errch := make(chan error)
 	go func() {
 		runtime.LockOSThread()

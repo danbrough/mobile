@@ -143,9 +143,7 @@ func buildEnvInit() (cleanup func(), err error) {
 			fmt.Printf("WORK=%s\n", tmpdir)
 			return
 		}
-		if !dan.DanHacks {
-			removeAll(tmpdir)
-		}
+		removeAll(tmpdir)
 	}
 	if buildN {
 		tmpdir = "$WORK"

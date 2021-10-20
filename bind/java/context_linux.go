@@ -9,13 +9,12 @@ package java // import "github.com/danbrough/mobile/bind/java"
 import "C"
 
 import (
-	"github.com/danbrough/mobile/dan"
 	"unsafe"
 	"github.com/danbrough/internal/mobileinit"
 )
 
 //export setContext
 func setContext(vm *C.JavaVM, ctx C.jobject) {
-	dan.DanLog.Info("setContext()")
+	printf("%s:%d setContext()\n",__LINE__,__FILE__);
 	mobileinit.SetCurrentContext(unsafe.Pointer(vm), uintptr(ctx))
 }

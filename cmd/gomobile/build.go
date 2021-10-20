@@ -278,7 +278,6 @@ type binInfo struct {
 }
 
 func init() {
-  dan.DanLog.Info("init()")
   addBuildFlags(cmdBuild)
   addBuildFlagsNVXWork(cmdBuild)
 
