@@ -1,4 +1,4 @@
-module demos/basic
+module github.com/danbrough/mobile/demos/basic
 
 go 1.16
 
