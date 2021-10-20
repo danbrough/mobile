@@ -6,6 +6,12 @@ This fork of [GoMobile](https://pkg.go.dev/golang.org/x/mobile) has been modifie
 
 It's currently working on linux (amd64 but arm64, arm, x86 should work also).
 
+I'm not a mac developer but it shouldn't too hard to get this running on darwin,
+if the original project doesn't do that already.
+
+To get started have a look at the [demos/basic](demos/basic/README.md) demonstration.
+
+Feel free to make any contributionsS.
 
 
 [![Go Reference](https://pkg.go.dev/badge/golang.org/x/mobile.svg)](https://pkg.go.dev/golang.org/x/mobile)

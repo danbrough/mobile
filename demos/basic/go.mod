@@ -1,4 +1,4 @@
-module demos/hello
+module demos/basic
 
 go 1.16
 
