@@ -14,7 +14,7 @@ import (
 
 // General mobile build environment. Initialized by envInit.
 var (
-  gomobilepath string // $GOPATH/pkg/gomobile
+  gojava string // $GOPATH/pkg/gomobile
 
   androidEnv map[string][]string // android arch -> []string
 
@@ -120,23 +120,23 @@ func contains(haystack []string, needle string) bool {
 }
 
 func buildEnvInit() (cleanup func(), err error) {
-  // Find gomobilepath.
+  // Find gojava.
   dan.DanLog.Info("buildEnvInit()")
   gopath := goEnv("GOPATH")
   for _, p := range filepath.SplitList(gopath) {
-    gomobilepath = filepath.Join(p, "pkg", "gojava")
-    if _, err := os.Stat(gomobilepath); buildN || err == nil {
+    gojava = filepath.Join(p, "pkg", "gojava")
+    if _, err := os.Stat(gojava); buildN || err == nil {
       break
     }
   }
 
   if buildX {
-    fmt.Fprintln(xout, "GOMOBILE="+gomobilepath)
+    fmt.Fprintln(xout, "GOMOBILE="+gojava)
   }
 
   // Check the toolchain is in a good state.
   // Pick a temporary directory for assembling an apk/app.
-  if gomobilepath == "" {
+  if gojava == "" {
     return nil, errors.New("toolchain not installed, run `gojava init`")
   }
 
