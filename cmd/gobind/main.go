@@ -8,19 +8,18 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/danbrough/mobile/internal/importers"
+	"github.com/danbrough/mobile/internal/importers/java"
+	"github.com/danbrough/mobile/internal/importers/objc"
 	"go/ast"
 	"go/types"
-	"github.com/danbrough/mobile/dan"
+	"golang.org/x/tools/go/packages"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"github.com/danbrough/mobile/internal/importers"
-	"github.com/danbrough/mobile/internal/importers/java"
-	"github.com/danbrough/mobile/internal/importers/objc"
-	"golang.org/x/tools/go/packages"
 )
 
 var (
@@ -38,9 +37,7 @@ var usage = `The Gobind tool generates Java language bindings for Go.
 For usage details, see doc.go.`
 
 func main() {
-	dan.DanLog.Warn("gobind main()")
 	flag.Parse()
-
 	run()
 	os.Exit(exitStatus)
 }

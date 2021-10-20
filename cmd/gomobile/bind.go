@@ -9,7 +9,6 @@ import (
   "encoding/json"
   "errors"
   "fmt"
-  "github.com/danbrough/mobile/dan"
   "io"
   "io/ioutil"
   "os"
@@ -79,7 +78,6 @@ func runBind(cmd *command) error {
 
   targets, err := parseBuildTarget(buildTarget)
   if err != nil {
-    dan.DanLog.Error("parseBuildTarget failed. invalid -target=%q: %v", buildTarget, err)
     return fmt.Errorf(`invalid -target=%q: %v`, buildTarget, err)
   }
 

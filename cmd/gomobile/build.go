@@ -10,7 +10,6 @@ import (
   "bufio"
   "errors"
   "fmt"
-  "github.com/danbrough/mobile/dan"
   "golang.org/x/tools/go/packages"
   "io"
   "os"
@@ -85,7 +84,6 @@ func runBuild(cmd *command) (err error) {
 // runBuildImpl builds a package for mobiles based on the given commands.
 // runBuildImpl returns a built package information and an error if exists.
 func runBuildImpl(cmd *command) (*packages.Package, error) {
-  dan.DanLog.Info("runBuildImpl %s", cmd.Name)
   cleanup, err := buildEnvInit()
   if err != nil {
     return nil, err
@@ -96,7 +94,6 @@ func runBuildImpl(cmd *command) (*packages.Package, error) {
 
   targets, err := parseBuildTarget(buildTarget)
   if err != nil {
-    dan.DanLog.Error("Invalid target: %s", buildTarget)
     return nil, fmt.Errorf(`invalid -target=%q: %v`, buildTarget, err)
   }
 

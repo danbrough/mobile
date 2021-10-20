@@ -8,7 +8,6 @@ import (
   "fmt"
   "go/constant"
   "go/types"
-  "github.com/danbrough/mobile/dan"
   "html"
   "math"
   "reflect"
@@ -1575,7 +1574,6 @@ func (g *JavaGen) GenC() error {
     }
 
     for _, m := range exportedMethodSet(types.NewPointer(s.obj.Type())) {
-      dan.DanLog.Info("m in exportedMethodSet() %s", s.obj.Name())
       var jm *java.Func
       if jinf != nil {
         jm = jinf.lookupMethod(m, g.hasThis(s.obj.Name(), m))
@@ -1612,7 +1610,7 @@ func (g *JavaGen) GenJava() error {
   g.Indent()
   g.Printf("static {\n")
   g.Indent()
-  g.Printf("System.out.println(\"Java: calling Seq.touch()\");\nSeq.touch();\nSystem.out.println(\"Java: Seq.touch() done\"); // for loading the native library\n")
+  g.Printf("Seq.touch(); // for loading the native library\n")
   if g.Pkg != nil {
     for _, p := range g.Pkg.Imports() {
       if g.validPkg(p) {

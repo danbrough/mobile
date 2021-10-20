@@ -7,9 +7,14 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/danbrough/mobile/bind"
+	"github.com/danbrough/mobile/internal/importers"
+	"github.com/danbrough/mobile/internal/importers/java"
+	"github.com/danbrough/mobile/internal/importers/objc"
 	"go/ast"
 	"go/token"
 	"go/types"
+	"golang.org/x/tools/go/packages"
 	"io"
 	"io/ioutil"
 	"os"
@@ -17,12 +22,6 @@ import (
 	"strings"
 	"unicode"
 	"unicode/utf8"
-
-	"github.com/danbrough/mobile/bind"
-	"github.com/danbrough/mobile/internal/importers"
-	"github.com/danbrough/mobile/internal/importers/java"
-	"github.com/danbrough/mobile/internal/importers/objc"
-	"golang.org/x/tools/go/packages"
 )
 
 func genPkg(lang string, p *types.Package, astFiles []*ast.File, allPkg []*types.Package, classes []*java.Class, otypes []*objc.Named) {
