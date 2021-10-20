@@ -24,7 +24,7 @@ func runClean(cmd *command) (err error) {
 	if len(gopaths) == 0 {
 		return fmt.Errorf("GOPATH is not set")
 	}
-	gomobilepath = filepath.Join(gopaths[0], "pkg/gojava")
+	gomobilepath = filepath.Join(gopaths[0], "pkg/gomobile")
 	if buildX {
 		fmt.Fprintln(xout, "GOMOBILE="+gomobilepath)
 	}

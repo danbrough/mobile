@@ -4,7 +4,7 @@
 
 package main
 
-//go:generate gojava help documentation doc.go
+//go:generate gomobile help documentation doc.go
 
 import (
 	"bufio"
@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	gomobileName = "gojava"
+	gomobileName = "gomobile"
 	goVersionOut = []byte(nil)
 )
 
@@ -82,7 +82,7 @@ func main() {
 			return
 		}
 	}
-	fmt.Fprintf(os.Stderr, "%s: unknown subcommand %q\nRun 'gojava help' for usage.\n", os.Args[0], args[0])
+	fmt.Fprintf(os.Stderr, "%s: unknown subcommand %q\nRun 'gomobile help' for usage.\n", os.Args[0], args[0])
 	os.Exit(2)
 }
 
@@ -144,7 +144,7 @@ func helpDocumentation(path string) {
 		w.WriteString("\n\n")
 		w.WriteRune(unicode.ToUpper(r))
 		w.WriteString(cmd.Short[rlen:])
-		w.WriteString("\n\nUsage:\n\n\tgojava " + cmd.Name)
+		w.WriteString("\n\nUsage:\n\n\tgomobile " + cmd.Name)
 		if cmd.Usage != "" {
 			w.WriteRune(' ')
 			w.WriteString(cmd.Usage)
@@ -153,7 +153,7 @@ func helpDocumentation(path string) {
 		w.WriteString(cmd.Long)
 	}
 
-	w.WriteString("*/\npackage main // import \"github.com/danbrough/mobile/cmd/gojava\"\n")
+	w.WriteString("*/\npackage main // import \"github.com/danbrough/mobile/cmd/gomobile\"\n")
 
 	if err := ioutil.WriteFile(path, w.Bytes(), 0666); err != nil {
 		log.Fatal(err)
@@ -184,23 +184,23 @@ func (cmd *command) usage() {
 }
 
 var usageTmpl = template.Must(template.New("usage").Parse(
-	`GoJava is a tool for building and running mobile apps written in Go.
+	`Gomobile is a tool for building and running mobile apps written in Go.
 
 To install:
 
-	$ go install github.com/danbrough/mobile/cmd/gojava@latest
-	$ gojava init
+	$ go install github.com/danbrough/mobile/cmd/gomobile@latest
+	$ gomobile init
 
 At least Go 1.16 is required.
 For detailed instructions, see https://golang.org/wiki/Mobile.
 
 Usage:
 
-	gojava command [arguments]
+	gomobile command [arguments]
 
 Commands:
 {{range .}}
 	{{.Name | printf "%-11s"}} {{.Short}}{{end}}
 
-Use 'gojava help [command]' for more information about that command.
+Use 'gomobile help [command]' for more information about that command.
 `))

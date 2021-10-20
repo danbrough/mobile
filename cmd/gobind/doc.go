@@ -8,8 +8,8 @@ functions from Java and Objective-C.
 
 Typically gobind is not used directly. Instead, a binding is
 generated and automatically packaged for Android or iOS by
-`gojava bind`. For more details on installing and using the gojava
-tool, see https://github.com/danbrough/mobile/cmd/gojava.
+`gomobile bind`. For more details on installing and using the gomobile
+tool, see https://github.com/danbrough/mobile/cmd/gomobile.
 
 Binding Go
 
@@ -22,7 +22,7 @@ manually requires calling it twice, first with -lang=<target>, where
 target is either java or objc, and again with -lang=go. The generated
 package can then be _ imported into a Go program, typically built
 with -buildmode=c-archive for iOS or -buildmode=c-shared for Android.
-These details are handled by the `gojava bind` command.
+These details are handled by the `gomobile bind` command.
 
 Passing Go objects to target languages
 

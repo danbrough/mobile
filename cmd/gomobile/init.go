@@ -30,8 +30,8 @@ var cmdInit = &command{
 	Short: "build OpenAL for Android",
 	Long: `
 If a OpenAL source directory is specified with -openal, init will
-build an Android version of OpenAL for use with gojava build
-and gojava install.
+build an Android version of OpenAL for use with gomobile build
+and gomobile install.
 `,
 }
 
@@ -46,22 +46,22 @@ func runInit(cmd *command) error {
 	if len(gopaths) == 0 {
 		return fmt.Errorf("GOPATH is not set")
 	}
-	gojavapath = filepath.Join(gopaths[0], "pkg/gojava")
+	gomobilepath = filepath.Join(gopaths[0], "pkg/gomobile")
 
 	if buildX || buildN {
-		fmt.Fprintln(xout, "gojava="+gojavapath)
+		fmt.Fprintln(xout, "GOMOBILE="+gomobilepath)
 	}
-	removeAll(gojavapath)
+	removeAll(gomobilepath)
 
-	if err := mkdir(gojavapath); err != nil {
+	if err := mkdir(gomobilepath); err != nil {
 		return err
 	}
 
 	if buildN {
-		tmpdir = filepath.Join(gojavapath, "work")
+		tmpdir = filepath.Join(gomobilepath, "work")
 	} else {
 		var err error
-		tmpdir, err = ioutil.TempDir(gojavapath, "work-")
+		tmpdir, err = ioutil.TempDir(gomobilepath, "work-")
 		if err != nil {
 			return err
 		}
@@ -98,7 +98,7 @@ func runInit(cmd *command) error {
 
 	start := time.Now()
 
-	if err := installOpenAL(gojavapath); err != nil {
+	if err := installOpenAL(gomobilepath); err != nil {
 		return err
 	}
 
@@ -109,7 +109,7 @@ func runInit(cmd *command) error {
 	return nil
 }
 
-func installOpenAL(gojavapath string) error {
+func installOpenAL(gomobilepath string) error {
 	if initOpenAL == "" {
 		return nil
 	}
@@ -149,10 +149,10 @@ func installOpenAL(gojavapath string) error {
 	}
 	var alTmpDir string
 	if buildN {
-		alTmpDir = filepath.Join(gojavapath, "work")
+		alTmpDir = filepath.Join(gomobilepath, "work")
 	} else {
 		var err error
-		alTmpDir, err = ioutil.TempDir(gojavapath, "openal-release-")
+		alTmpDir, err = ioutil.TempDir(gomobilepath, "openal-release-")
 		if err != nil {
 			return err
 		}
@@ -160,7 +160,7 @@ func installOpenAL(gojavapath string) error {
 	}
 
 	for _, f := range []string{"include/AL/al.h", "include/AL/alc.h"} {
-		dst := filepath.Join(gojavapath, f)
+		dst := filepath.Join(gomobilepath, f)
 		src := filepath.Join(initOpenAL, f)
 		if err := copyFile(dst, src); err != nil {
 			return err
@@ -199,7 +199,7 @@ func installOpenAL(gojavapath string) error {
 			return err
 		}
 
-		dst := filepath.Join(gojavapath, "lib", t.abi, "libopenal.so")
+		dst := filepath.Join(gomobilepath, "lib", t.abi, "libopenal.so")
 		src := filepath.Join(alTmpDir, "build", abi, "libopenal.so")
 		if err := copyFile(dst, src); err != nil {
 			return err
