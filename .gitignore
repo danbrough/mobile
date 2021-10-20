@@ -24,3 +24,4 @@ example/bind/android/app/build
 /.version
 /publish.sh
 **/pkg
+**.jar
