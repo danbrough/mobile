@@ -3,8 +3,10 @@
 cd `dirname $0`
 
 
-#go install golang.org/x/mobile/cmd/gomobile
-#go install golang.org/x/mobile/cmd/gobind
-#go mod tidy
+#go get -d  github.com/danbrough/mobile/cmd/gomobile@latest
+#go get -d  github.com/danbrough/mobile/cmd/gobind@latest
+#go get -d github.com/danbrough/mobile/cmd/gomobile@latest
+go install github.com/danbrough/mobile/cmd/gomobile@latest
+go install github.com/danbrough/mobile/cmd/gobind@latest
+go run github.com/danbrough/mobile/cmd/gomobile@latest bind -target=linux/amd64  -v -o build_linux demos/hello/hello
 
-go run golang.org/x/mobile/cmd/gomobile bind -target=linux/amd64  -v -o build_linux demos/hello/hello

@@ -1,9 +1,5 @@
 module demos/hello
 
-go 1.17
+go 1.16
 
-replace github.com/danbrough/mobile  => ../../
-
-require (
-	github.com/danbrough/mobile v0.0.1-alpha05 // indirect
-)
+require github.com/danbrough/mobile v0.0.1-alpha11 // indirect
