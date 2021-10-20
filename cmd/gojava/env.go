@@ -124,7 +124,7 @@ func buildEnvInit() (cleanup func(), err error) {
   dan.DanLog.Info("buildEnvInit()")
   gopath := goEnv("GOPATH")
   for _, p := range filepath.SplitList(gopath) {
-    gomobilepath = filepath.Join(p, "pkg", "gomobile")
+    gomobilepath = filepath.Join(p, "pkg", "gojava")
     if _, err := os.Stat(gomobilepath); buildN || err == nil {
       break
     }
@@ -137,7 +137,7 @@ func buildEnvInit() (cleanup func(), err error) {
   // Check the toolchain is in a good state.
   // Pick a temporary directory for assembling an apk/app.
   if gomobilepath == "" {
-    return nil, errors.New("toolchain not installed, run `gomobile init`")
+    return nil, errors.New("toolchain not installed, run `gojava init`")
   }
 
   cleanupFn := func() {
@@ -154,10 +154,10 @@ func buildEnvInit() (cleanup func(), err error) {
     cleanupFn = func() {}
   } else {
     if dan.DanHacks {
-      tmpdir = "/tmp/gomobile"
+      tmpdir = "/tmp/gojava"
       os.Mkdir(tmpdir, 0755)
     } else {
-      tmpdir, err = ioutil.TempDir("", "gomobile-work-")
+      tmpdir, err = ioutil.TempDir("", "gojava-work-")
       if err != nil {
         return nil, err
       }
@@ -180,7 +180,7 @@ func envInit() (err error) {
   if ndkRoot, err := ndkRoot(); err == nil {
     androidEnv = make(map[string][]string)
     if buildAndroidAPI < minAndroidAPI {
-      return fmt.Errorf("gomobile requires Android API level >= %d", minAndroidAPI)
+      return fmt.Errorf("gojava requires Android API level >= %d", minAndroidAPI)
     }
     for arch, toolchain := range ndk {
       clang := toolchain.Path(ndkRoot, "clang")
