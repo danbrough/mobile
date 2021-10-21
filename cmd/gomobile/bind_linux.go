@@ -37,6 +37,8 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 			println("FOUND JAVA_HOME:", *javaHome)
 			cmd.Env = append(cmd.Env, "CGO_CFLAGS=-I"+*javaHome+"/include -I"+*javaHome+"/include/linux")
 			break
+		} else if strings.HasPrefix(s, "CFLAGS") {
+			cmd.Env = append(cmd.Env, s)
 		}
 	}
 	if javaHome == nil {
