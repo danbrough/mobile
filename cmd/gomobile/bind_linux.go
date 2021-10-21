@@ -31,7 +31,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 	var javaHome *string
 
 	for _, s := range os.Environ() {
-		println("ENV:",s)
+		//println("ENV:",s)
 		if strings.HasPrefix(s, "JAVA_HOME") {
 			println("FOUND ", s)
 			javaHome = &strings.Split(s, "=")[1]
