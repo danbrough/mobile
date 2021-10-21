@@ -47,7 +47,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 		return err
 	}
 
-	androidDir := filepath.Join(tmpdir, "android")
+	linuxDir := filepath.Join(tmpdir, "linux")
 
 	modulesUsed, err := areGoModulesUsed()
 	if err != nil {
@@ -79,7 +79,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 			"./gobind",
 			env,
 			"-buildmode=c-shared",
-			"-o="+filepath.Join(androidDir, "libs/"+toolchain.abi+"/libgojni.so"),
+			"-o="+filepath.Join(linuxDir, "libs/"+toolchain.abi+"/libgojni.so"),
 		)
 		if err != nil {
 			return err
@@ -87,7 +87,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 	}
 
 	jsrc := filepath.Join(tmpdir, "java")
-	/*if err := buildAAR(jsrc, androidDir, pkgs, targets); err != nil {
+	/*if err := buildAAR(jsrc, linuxDir, pkgs, targets); err != nil {
 		return err
 	}*/
 	return buildSrcJar(jsrc)
