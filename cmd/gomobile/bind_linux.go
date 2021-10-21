@@ -7,6 +7,7 @@ package main
 import (
 	"fmt"
 	"golang.org/x/tools/go/packages"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -29,7 +30,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 
 	var javaHome  *string
 
-	for _, s := range cmd.Env {
+	for _, s := range os.Environ() {
 		if strings.HasPrefix(s, "JAVA_HOME") {
 			javaHome = &strings.Split(s,"=")[1]
 			println("FOUND JAVA_HOME:",javaHome)
