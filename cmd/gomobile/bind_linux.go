@@ -31,6 +31,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 	var javaHome *string
 
 	for _, s := range os.Environ() {
+		println("ENV:",s)
 		if strings.HasPrefix(s, "JAVA_HOME") {
 			println("FOUND ", s)
 			javaHome = &strings.Split(s, "=")[1]
@@ -39,7 +40,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 			//cmd.Env = append(cmd.Env, "CFLAGS=-I"+*javaHome+"/include -I"+*javaHome+"/include/linux")
 		} else if strings.HasPrefix(s, "CFLAGS") {
 			cmd.Env = append(cmd.Env, s)
-		}else if strings.HasPrefix(s, "CGO_CFLAGS") {
+		} else if strings.HasPrefix(s, "CGO_CFLAGS") {
 			println("ADDING",s)
 			cmd.Env = append(cmd.Env, s)
 		}
@@ -48,7 +49,6 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 		println("NO JAVA_HOME FOUND!!!!!!!!!!!!")
 	}
 
-	println("HELLLO MR MAN!!!!!!!!")
 	cmd.Env = append(cmd.Env, "GOOS=linux")
 	cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
 	if len(buildTags) > 0 {
