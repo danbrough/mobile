@@ -16,6 +16,9 @@ import (
 func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) error {
 
 	println("goLinuxBind() gobind:", gobind, "os:", runtime.GOOS, "arch:", runtime.GOARCH)
+	for _, t := range targets {
+		println("target: platform:", t.platform, "arch:", t.arch)
+	}
 
 	// Run gobind to generate the bindings
 	cmd := exec.Command(
