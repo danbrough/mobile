@@ -26,6 +26,20 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 		"-lang=go,java",
 		"-outdir="+tmpdir,
 	)
+
+	var javaHome  *string
+
+	for _, s := range cmd.Env {
+		if strings.HasPrefix(s, "JAVA_HOME") {
+			javaHome = &strings.Split(s,"=")[1]
+			println("FOUND JAVA_HOME:",javaHome)
+			break
+		}
+	}
+	if javaHome == nil {
+		println("NO JAVA_HOME FOUND!!!!!!!!!!!!")
+	}
+
 	cmd.Env = append(cmd.Env, "GOOS=linux")
 	cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
 	if len(buildTags) > 0 {
