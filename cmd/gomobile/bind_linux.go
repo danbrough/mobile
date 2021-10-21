@@ -9,11 +9,13 @@ import (
 	"golang.org/x/tools/go/packages"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
 func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) error {
 
+	println("goLinuxBind() gobind:", gobind, "os:", runtime.GOOS, "arch:", runtime.GOARCH)
 
 	// Run gobind to generate the bindings
 	cmd := exec.Command(
@@ -87,4 +89,3 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 	}*/
 	return buildSrcJar(jsrc)
 }
-
