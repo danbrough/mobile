@@ -7,6 +7,8 @@ package main
 import (
 	"fmt"
 	"golang.org/x/tools/go/packages"
+	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,6 +22,17 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 	for _, t := range targets {
 		println("target: platform:", t.platform, "arch:", t.arch)
 	}
+
+
+	pkgName := pkgs[0].Name
+
+	if buildO == "" {
+		buildO = "."
+	}
+	buildO, _ = filepath.Abs(buildO)
+
+	println("buildO:", buildO, "pkgName:", pkgName)
+
 
 	// Run gobind to generate the bindings
 	cmd := exec.Command(
@@ -41,7 +54,10 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 		} else if strings.HasPrefix(s, "CFLAGS") {
 			cmd.Env = append(cmd.Env, s)
 		} else if strings.HasPrefix(s, "CGO_CFLAGS") {
-			println("ADDING",s)
+			println("ADDING", s)
+			cmd.Env = append(cmd.Env, s)
+		} else if strings.HasPrefix(s, "CGO_LDFLAGS") {
+			println("ADDING", s)
 			cmd.Env = append(cmd.Env, s)
 		}
 	}
@@ -70,7 +86,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 		return err
 	}
 
-	linuxDir := filepath.Join(tmpdir, "linux")
+	//linuxDir := filepath.Join(tmpdir, "linux")
 
 	modulesUsed, err := areGoModulesUsed()
 	if err != nil {
@@ -96,22 +112,123 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 			}
 		}
 
-		toolchain := ndk.Toolchain(t.arch)
+		//toolchain := ndk.Toolchain(t.arch)
 		err := goBuildAt(
 			filepath.Join(tmpdir, "src"),
 			"./gobind",
 			env,
 			"-buildmode=c-shared",
-			"-o="+filepath.Join(linuxDir, "libs/"+toolchain.abi+"/libgojni.so"),
+			"-o="+filepath.Join(buildO, "libs",t.arch,"libgojni.so"),
 		)
 		if err != nil {
 			return err
 		}
 	}
 
+
 	jsrc := filepath.Join(tmpdir, "java")
 	/*if err := buildAAR(jsrc, linuxDir, pkgs, targets); err != nil {
 		return err
 	}*/
-	return buildSrcJar(jsrc)
+
+	/*	jarw := zip.NewWriter(out)
+		jarwcreate := func(name string) (io.Writer, error) {
+			if buildV {
+				fmt.Fprintf(os.Stderr, "aar: %s\n", name)
+			}
+			return jarw.Create(name)
+		}*/
+	err = buildLinuxSrcJar(jsrc, filepath.Join(buildO, pkgName+"-sources.jar"))
+	if err != nil {
+		return err
+	}
+
+	var out io.Writer = ioutil.Discard
+	if !buildN {
+		f, err := os.Create(filepath.Join(buildO, pkgName+".jar"))
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if cerr := f.Close(); err == nil {
+				err = cerr
+			}
+		}()
+		out = f
+	}
+	return buildLinuxJar(out, jsrc)
+
+}
+
+func buildLinuxJar(w io.Writer, srcDir string) error {
+	println("buildLinuxJar() srcDir:",srcDir)
+	var srcFiles []string
+	if buildN {
+		srcFiles = []string{"*.java"}
+	} else {
+		err := filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if filepath.Ext(path) == ".java" {
+				srcFiles = append(srcFiles, filepath.Join(".", path[len(srcDir):]))
+			}
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	dst := filepath.Join(tmpdir, "javac-output")
+	if !buildN {
+		if err := os.MkdirAll(dst, 0700); err != nil {
+			return err
+		}
+	}
+
+	//bClspath := bindBootClasspath
+
+
+	args := []string{
+		"-d", dst,
+		//"-source", javacTargetVer,
+	//	"-target", javacTargetVer,
+	//	"-bootclasspath", bClspath,
+	}
+	if bindClasspath != "" {
+		args = append(args, "-classpath", bindClasspath)
+	}
+
+	args = append(args, srcFiles...)
+
+	javac := exec.Command("javac", args...)
+	javac.Dir = srcDir
+	if err := runCmd(javac); err != nil {
+		return err
+	}
+
+	if buildX {
+		printcmd("jar c -C %s .", dst)
+	}
+	return writeJar(w, dst)
+}
+
+func buildLinuxSrcJar(src string, output string) error {
+	println("buildLinuxSrcJar() src:", src, "output:", output)
+	var out io.Writer = ioutil.Discard
+	if !buildN {
+		f, err := os.Create(output)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if cerr := f.Close(); err == nil {
+				err = cerr
+			}
+		}()
+		out = f
+	}
+
+	return writeJar(out, src)
 }

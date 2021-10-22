@@ -97,6 +97,7 @@ func goAndroidBind(gobind string, pkgs []*packages.Package, targets []targetInfo
 }
 
 func buildSrcJar(src string) error {
+	println("buildSrcJar() src:",src)
 	var out io.Writer = ioutil.Discard
 	if !buildN {
 		ext := filepath.Ext(buildO)

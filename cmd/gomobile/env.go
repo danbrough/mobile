@@ -311,6 +311,7 @@ func envInit() (err error) {
 }
 
 func ndkRoot() (string, error) {
+	println("ndkRoot()")
 	if buildN {
 		return "$NDK_PATH", nil
 	}
