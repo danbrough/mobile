@@ -2,5 +2,5 @@
 
 cd `dirname $0`   
 
-go install golang.org/x/mobile/cmd/gomobile
-go install golang.org/x/mobile/cmd/gobind
+go install github.com/danbrough/mobile/cmd/gomobile
+go install github.com/danbrough/mobile/cmd/gobind
