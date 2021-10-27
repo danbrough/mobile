@@ -1,6 +1,5 @@
 package hello
 
-
 import "time"
 
 func GetMessage() string {
