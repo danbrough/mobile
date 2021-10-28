@@ -59,7 +59,7 @@ func TestBindAndroid(t *testing.T) {
 		if goos == "windows" {
 			os.Setenv("HOMEDRIVE", "C:")
 		}
-		cmdBind.flag.Parse([]string{"golang.org/x/mobile/asset"})
+		cmdBind.flag.Parse([]string{"github.com/danbrough/mobile/asset"})
 		err := runBind(cmdBind)
 		if err != nil {
 			t.Log(buf.String())
@@ -141,7 +141,7 @@ func TestBindApple(t *testing.T) {
 		if goos == "windows" {
 			os.Setenv("HOMEDRIVE", "C:")
 		}
-		cmdBind.flag.Parse([]string{"golang.org/x/mobile/asset"})
+		cmdBind.flag.Parse([]string{"github.com/danbrough/mobile/asset"})
 		if err := runBind(cmdBind); err != nil {
 			t.Log(buf.String())
 			t.Fatal(err)
@@ -182,7 +182,7 @@ func TestBindApple(t *testing.T) {
 
 var bindAndroidTmpl = template.Must(template.New("output").Parse(`GOMOBILE={{.GOPATH}}/pkg/gomobile
 WORK=$WORK
-GOOS=android CGO_ENABLED=1 gobind -lang=go,java -outdir=$WORK{{if .JavaPkg}} -javapkg={{.JavaPkg}}{{end}} golang.org/x/mobile/asset
+GOOS=android CGO_ENABLED=1 gobind -lang=go,java -outdir=$WORK{{if .JavaPkg}} -javapkg={{.JavaPkg}}{{end}} github.com/danbrough/mobile/asset
 mkdir -p $WORK/src
 PWD=$WORK/src GOOS=android GOARCH=arm CC=$NDK_PATH/toolchains/llvm/prebuilt/{{.NDKARCH}}/bin/armv7a-linux-androideabi16-clang CXX=$NDK_PATH/toolchains/llvm/prebuilt/{{.NDKARCH}}/bin/armv7a-linux-androideabi16-clang++ CGO_ENABLED=1 GOARM=7 GOPATH=$WORK:$GOPATH go mod tidy
 PWD=$WORK/src GOOS=android GOARCH=arm CC=$NDK_PATH/toolchains/llvm/prebuilt/{{.NDKARCH}}/bin/armv7a-linux-androideabi16-clang CXX=$NDK_PATH/toolchains/llvm/prebuilt/{{.NDKARCH}}/bin/armv7a-linux-androideabi16-clang++ CGO_ENABLED=1 GOARM=7 GOPATH=$WORK:$GOPATH go build -x -buildmode=c-shared -o=$WORK/android/src/main/jniLibs/armeabi-v7a/libgojni.so ./gobind
@@ -193,7 +193,7 @@ jar c -C $WORK/javac-output .
 var bindAppleTmpl = template.Must(template.New("output").Parse(`GOMOBILE={{.GOPATH}}/pkg/gomobile
 WORK=$WORK
 rm -r -f "{{.Output}}.xcframework"
-GOOS=ios CGO_ENABLED=1 gobind -lang=go,objc -outdir=$WORK/ios -tags=ios{{if .Prefix}} -prefix={{.Prefix}}{{end}} golang.org/x/mobile/asset
+GOOS=ios CGO_ENABLED=1 gobind -lang=go,objc -outdir=$WORK/ios -tags=ios{{if .Prefix}} -prefix={{.Prefix}}{{end}} github.com/danbrough/mobile/asset
 mkdir -p $WORK/ios/src
 PWD=$WORK/ios/src GOOS=ios GOARCH=arm64 GOFLAGS=-tags=ios CC=iphoneos-clang CXX=iphoneos-clang++ CGO_CFLAGS=-isysroot iphoneos -miphoneos-version-min=13.0 -fembed-bitcode -arch arm64 CGO_CXXFLAGS=-isysroot iphoneos -miphoneos-version-min=13.0 -fembed-bitcode -arch arm64 CGO_LDFLAGS=-isysroot iphoneos -miphoneos-version-min=13.0 -fembed-bitcode -arch arm64 CGO_ENABLED=1 DARWIN_SDK=iphoneos GOPATH=$WORK/ios:$GOPATH go mod tidy
 PWD=$WORK/ios/src GOOS=ios GOARCH=arm64 GOFLAGS=-tags=ios CC=iphoneos-clang CXX=iphoneos-clang++ CGO_CFLAGS=-isysroot iphoneos -miphoneos-version-min=13.0 -fembed-bitcode -arch arm64 CGO_CXXFLAGS=-isysroot iphoneos -miphoneos-version-min=13.0 -fembed-bitcode -arch arm64 CGO_LDFLAGS=-isysroot iphoneos -miphoneos-version-min=13.0 -fembed-bitcode -arch arm64 CGO_ENABLED=1 DARWIN_SDK=iphoneos GOPATH=$WORK/ios:$GOPATH go build -x -buildmode=c-archive -o $WORK/{{.Output}}-ios-arm64.a ./gobind
@@ -240,7 +240,7 @@ func TestBindAppleAll(t *testing.T) {
 	if goos == "windows" {
 		os.Setenv("HOMEDRIVE", "C:")
 	}
-	cmdBind.flag.Parse([]string{"golang.org/x/mobile/asset"})
+	cmdBind.flag.Parse([]string{"github.com/danbrough/mobile/asset"})
 	if err := runBind(cmdBind); err != nil {
 		t.Log(buf.String())
 		t.Fatal(err)
@@ -258,10 +258,10 @@ func TestBindWithGoModules(t *testing.T) {
 	}
 	defer os.RemoveAll(dir)
 
-	if out, err := exec.Command("go", "build", "-o="+dir, "golang.org/x/mobile/cmd/gobind").CombinedOutput(); err != nil {
+	if out, err := exec.Command("go", "build", "-o="+dir, "github.com/danbrough/mobile/cmd/gobind").CombinedOutput(); err != nil {
 		t.Fatalf("%v: %s", err, string(out))
 	}
-	if out, err := exec.Command("go", "build", "-o="+dir, "golang.org/x/mobile/cmd/gomobile").CombinedOutput(); err != nil {
+	if out, err := exec.Command("go", "build", "-o="+dir, "github.com/danbrough/mobile/cmd/gomobile").CombinedOutput(); err != nil {
 		t.Fatalf("%v: %s", err, string(out))
 	}
 	path := dir
@@ -301,7 +301,7 @@ func TestBindWithGoModules(t *testing.T) {
 			}{
 				{
 					Name: "Absolute Path",
-					Path: "golang.org/x/mobile/bind/testdata/cgopkg",
+					Path: "github.com/danbrough/mobile/bind/testdata/cgopkg",
 				},
 				{
 					Name: "Relative Path",
