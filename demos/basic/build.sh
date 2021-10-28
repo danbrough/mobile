@@ -4,7 +4,7 @@ cd $(dirname $0)
 
 
 unset ANDROID_HOME
-export CGO_CFLAGS="-I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux"
+export CGO_CFLAGS="-D__GOBIND_LINUX__ -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux"
 
 
 go run github.com/danbrough/mobile/cmd/gomobile bind -target=linux/amd64 -x -v -work -o . \
