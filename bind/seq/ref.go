@@ -4,8 +4,10 @@
 
 package seq
 
-//#cgo LDFLAGS: -llog
+//#cgo android LDFLAGS: -llog
+//#ifdef __GOBIND_ANDROID__
 //#include <android/log.h>
+//#endif
 //#include <string.h>
 //import "C"
 
