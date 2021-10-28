@@ -93,7 +93,7 @@ func lineLog(f *os.File, priority C.int) {
 }
  */
 func init() {
-  println("init() GOOS:%s", runtime.GOOS)
+  println("init() GOOS:", runtime.GOOS)
 /*  log.SetOutput(infoWriter{})
   // android logcat includes all of log.LstdFlags
   log.SetFlags(log.Flags() &^ log.LstdFlags)
