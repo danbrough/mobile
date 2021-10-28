@@ -190,6 +190,9 @@ func genPkgH(w io.Writer, pname string) {
 #ifdef __GOBIND_ANDROID__
 #include "%[1]s_android.h"
 #endif
+#ifdef __GOBIND_LINUX__
+#include "%[1]s_linux.h"
+#endif
 #ifdef __GOBIND_DARWIN__
 #include "%[1]s_darwin.h"
 #endif`, pname)
