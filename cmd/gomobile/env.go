@@ -27,6 +27,10 @@ func isAndroidPlatform(platform string) bool {
 	return platform == "android"
 }
 
+func isLinuxPlatform(platform string) bool {
+	return platform == "linux"
+}
+
 func isApplePlatform(platform string) bool {
 	return contains(applePlatforms, platform)
 }
@@ -43,6 +47,8 @@ func platformArchs(platform string) []string {
 		return []string{"arm64", "amd64"}
 	case "android":
 		return []string{"arm", "arm64", "386", "amd64"}
+	case "linux":
+		return []string{"arm", "arm64", "386", "amd64"}
 	default:
 		panic(fmt.Sprintf("unexpected platform: %s", platform))
 	}
@@ -57,6 +63,8 @@ func platformOS(platform string) string {
 	switch platform {
 	case "android":
 		return "android"
+	case "linux":
+		return "linux"
 	case "ios", "iossimulator":
 		return "ios"
 	case "macos", "maccatalyst":
@@ -74,6 +82,8 @@ func platformTags(platform string) []string {
 	switch platform {
 	case "android":
 		return []string{"android"}
+	case "linux":
+		return []string{"linux"}
 	case "ios", "iossimulator":
 		return []string{"ios"}
 	case "macos":

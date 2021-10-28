@@ -8,7 +8,7 @@ export CGO_CFLAGS="-I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux"
 
 
 go run github.com/danbrough/mobile/cmd/gomobile bind -target=linux/amd64 -x -v -o . \
-  github.com/danbrough/mobile/demos/basic/hello
+  github.com/danbrough/mobile/demos/basic/hello || exit 1
 
 CLASSPATH=.:hello.jar
 

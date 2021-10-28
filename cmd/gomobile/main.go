@@ -12,6 +12,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/danbrough/mobile/klog"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -36,6 +37,7 @@ func printUsage(w io.Writer) {
 }
 
 func main() {
+	klog.KLog.Trace("main()")
 	gomobileName = os.Args[0]
 	flag.Usage = func() {
 		printUsage(os.Stderr)

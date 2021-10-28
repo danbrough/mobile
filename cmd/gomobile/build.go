@@ -10,6 +10,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/danbrough/mobile/klog"
 	"io"
 	"os"
 	"os/exec"
@@ -359,6 +360,7 @@ func goModTidyAt(at string, env []string) error {
 //    ios,iossimulator,maccatalyst
 //    macos/amd64
 func parseBuildTarget(buildTarget string) ([]targetInfo, error) {
+	klog.KLog.Info("parseBuildTarget() :%s",buildTarget)
 	if buildTarget == "" {
 		return nil, fmt.Errorf(`invalid target ""`)
 	}
@@ -381,7 +383,7 @@ func parseBuildTarget(buildTarget string) ([]targetInfo, error) {
 		}
 	}
 
-	var isAndroid, isApple bool
+	var isAndroid, isApple, isLinux bool
 	for _, target := range strings.Split(buildTarget, ",") {
 		tuple := strings.SplitN(target, "/", 2)
 		platform := tuple[0]
@@ -389,6 +391,8 @@ func parseBuildTarget(buildTarget string) ([]targetInfo, error) {
 
 		if isAndroidPlatform(platform) {
 			isAndroid = true
+		} else if isLinuxPlatform(platform){
+			isLinux = true
 		} else if isApplePlatform(platform) {
 			isApple = true
 		} else {
@@ -397,10 +401,13 @@ func parseBuildTarget(buildTarget string) ([]targetInfo, error) {
 		if isAndroid && isApple {
 			return nil, fmt.Errorf(`cannot mix android and Apple platforms`)
 		}
-
+		if isAndroid && isLinux {
+			return nil, fmt.Errorf(`cannot mix android and Linux platforms`)
+		}
 		if hasArch {
 			arch := tuple[1]
 			if !isSupportedArch(platform, arch) {
+				klog.KLog.Error(`unsupported platform/arch: %q`, target)
 				return nil, fmt.Errorf(`unsupported platform/arch: %q`, target)
 			}
 			addTarget(platform, arch)

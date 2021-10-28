@@ -88,6 +88,7 @@ func runBind(cmd *command) error {
 		if _, err := ndkRoot(); err != nil {
 			return err
 		}
+	} else if isLinuxPlatform(targets[0].platform) {
 	} else {
 		if bindJavaPkg != "" {
 			return fmt.Errorf("-javapkg is supported only for android target")
@@ -125,6 +126,8 @@ func runBind(cmd *command) error {
 	switch {
 	case isAndroidPlatform(targets[0].platform):
 		return goAndroidBind(gobind, pkgs, targets)
+	case isLinuxPlatform(targets[0].platform):
+		return goLinuxBind(gobind,pkgs,targets)
 	case isApplePlatform(targets[0].platform):
 		if !xcodeAvailable() {
 			return fmt.Errorf("-target=%q requires Xcode", buildTarget)
