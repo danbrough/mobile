@@ -15,7 +15,8 @@ import (
 )
 
 func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) error {
-	if sdkDir := os.Getenv("JAVA_HOME"); sdkDir == "" {
+	var sdkDir string
+	if sdkDir = os.Getenv("JAVA_HOME"); sdkDir == "" {
 		return fmt.Errorf("this command requires the JAVA_HOME variable (path to the Java SDK)")
 	}
 
@@ -27,6 +28,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 	)
 	cmd.Env = append(cmd.Env, "GOOS=linux")
 	cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
+	cmd.Env = append(cmd.Env, "CGO_CFLAGS=-I"+sdkDir + "/include -I" + sdkDir + "/include/linux")
 	if len(buildTags) > 0 {
 		cmd.Args = append(cmd.Args, "-tags="+strings.Join(buildTags, ","))
 	}
@@ -59,26 +61,26 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 			return err
 		}
 
-		env := androidEnv[t.arch]
+		//env := androidEnv[t.arch]
 		// Add the generated packages to GOPATH for reverse bindings.
 		gopath := fmt.Sprintf("GOPATH=%s%c%s", tmpdir, filepath.ListSeparator, goEnv("GOPATH"))
-		env = append(env, gopath)
+		cmd.Env = append(cmd.Env, gopath)
 
 		// Run `go mod tidy` to force to create go.sum.
 		// Without go.sum, `go build` fails as of Go 1.16.
 		if modulesUsed {
-			if err := goModTidyAt(filepath.Join(tmpdir, "src"), env); err != nil {
+			if err := goModTidyAt(filepath.Join(tmpdir, "src"), cmd.Env); err != nil {
 				return err
 			}
 		}
 
-		toolchain := ndk.Toolchain(t.arch)
+		//toolchain := ndk.Toolchain(t.arch)
 		err := goBuildAt(
 			filepath.Join(tmpdir, "src"),
 			"./gobind",
-			env,
+			cmd.Env,
 			"-buildmode=c-shared",
-			"-o="+filepath.Join(linuxDir, "libs/"+toolchain.abi+"/libgojni.so"),
+			"-o="+filepath.Join(linuxDir, "libs/"+t.arch+"/libgojni.so"),
 		)
 		if err != nil {
 			return err

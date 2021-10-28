@@ -310,6 +310,7 @@ func goCmd(subcmd string, srcs []string, env []string, args ...string) error {
 
 func goCmdAt(at string, subcmd string, srcs []string, env []string, args ...string) error {
 	cmd := exec.Command("go", subcmd)
+	klog.KLog.Debug("goCmdAt() at:%s subcmd:%s srcs:%s args:%s env:%s",at,subcmd,strings.Join(srcs,","),strings.Join(args,","),strings.Join(env,","))
 	tags := buildTags
 	if len(tags) > 0 {
 		cmd.Args = append(cmd.Args, "-tags", strings.Join(tags, ","))
