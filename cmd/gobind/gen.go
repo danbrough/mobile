@@ -78,6 +78,16 @@ func genPkg(lang string, p *types.Package, astFiles []*ast.File, allPkg []*types
 		processErr(g.GenH())
 		io.Copy(w, &buf)
 		closer()
+		buf.Reset()
+		w, closer = writer(filepath.Join("src", "gobind", pname+"_linux.c"))
+		processErr(g.GenC())
+		io.Copy(w, &buf)
+		closer()
+		buf.Reset()
+		w, closer = writer(filepath.Join("src", "gobind", pname+"_linux.h"))
+		processErr(g.GenH())
+		io.Copy(w, &buf)
+		closer()
 		// Generate support files along with the universe package
 		if p == nil {
 			dir, err := packageDir("github.com/danbrough/mobile/bind")
@@ -113,6 +123,9 @@ func genPkg(lang string, p *types.Package, astFiles []*ast.File, allPkg []*types
 			copyFile(filepath.Join("src", "gobind", "seq_android.c"), filepath.Join(javaDir, "seq_android.c.support"))
 			copyFile(filepath.Join("src", "gobind", "seq_android.go"), filepath.Join(javaDir, "seq_android.go.support"))
 			copyFile(filepath.Join("src", "gobind", "seq_android.h"), filepath.Join(javaDir, "seq_android.h"))
+			copyFile(filepath.Join("src", "gobind", "seq_linux.c"), filepath.Join(javaDir, "seq_linux.c.support"))
+			copyFile(filepath.Join("src", "gobind", "seq_linux.go"), filepath.Join(javaDir, "seq_linux.go.support"))
+			copyFile(filepath.Join("src", "gobind", "seq_linux.h"), filepath.Join(javaDir, "seq_linux.h"))
 		}
 	case "go":
 		w, closer := writer(filepath.Join("src", "gobind", fname))
