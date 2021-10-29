@@ -6,6 +6,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/danbrough/mobile/klog"
 	"io"
 	"io/ioutil"
 	"os"
@@ -17,10 +18,12 @@ import (
 )
 
 func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) error {
+	klog.KLog.Info("goLinuxBind() gobind:%s build0:%s", gobind, buildO)
 	var sdkDir string
 	if sdkDir = os.Getenv("JAVA_HOME"); sdkDir == "" {
 		return fmt.Errorf("this command requires the JAVA_HOME variable (path to the Java SDK)")
 	}
+	jniIncludeDir := filepath.Join(sdkDir, "include")
 
 	// Run gobind to generate the bindings
 	cmd := exec.Command(
@@ -30,7 +33,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 	)
 	cmd.Env = append(cmd.Env, "GOOS=linux")
 	cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
-	cmd.Env = append(cmd.Env, "CGO_CFLAGS=-I"+sdkDir+"/include -I"+sdkDir+"/include/linux")
+	cmd.Env = append(cmd.Env, "CGO_CFLAGS=-I"+jniIncludeDir+" -I"+filepath.Join(jniIncludeDir, "linux"))
 	if len(buildTags) > 0 {
 		cmd.Args = append(cmd.Args, "-tags="+strings.Join(buildTags, ","))
 	}
@@ -50,7 +53,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 		return err
 	}
 
-	linuxDir := filepath.Join(tmpdir, "linux")
+	buildDir, _ := filepath.Abs(buildO)
 
 	modulesUsed, err := areGoModulesUsed()
 	if err != nil {
@@ -77,12 +80,14 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 		}
 
 		//toolchain := ndk.Toolchain(t.arch)
+
+
 		err := goBuildAt(
 			filepath.Join(tmpdir, "src"),
 			"./gobind",
 			cmd.Env,
 			"-buildmode=c-shared",
-			"-o="+filepath.Join(linuxDir, "libs/"+t.arch+"/libgojni.so"),
+			"-o="+filepath.Join(buildDir,"libs", t.arch, "libgojni.so"),
 		)
 		if err != nil {
 			return err
@@ -91,20 +96,38 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 
 	jsrc := filepath.Join(tmpdir, "java")
 
-	if err := buildLinuxJar(jsrc, sdkDir, pkgs, targets); err != nil {
+	if err := buildLinuxJar(jsrc, buildDir, pkgs, targets); err != nil {
 		return err
 	}
-	return buildSrcJar(jsrc)
+	return buildLinuxSrcJar(filepath.Join(buildDir,pkgs[0].Name + "-sources.jar"),jsrc)
 }
 
-func buildLinuxJar(srcDir, sdkDir string, pkgs []*packages.Package, targets []targetInfo) (err error) {
+func buildLinuxSrcJar(output string,src string) error {
+	var out io.Writer = ioutil.Discard
+	if !buildN {
+		f, err := os.Create(output)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if cerr := f.Close(); err == nil {
+				err = cerr
+			}
+		}()
+		out = f
+	}
+
+	return writeJar(out, src)
+}
+
+func buildLinuxJar(srcDir, buildDir string, pkgs []*packages.Package, targets []targetInfo) (err error) {
 	var out io.Writer = ioutil.Discard
 	if buildO == "" {
 		buildO = pkgs[0].Name
 	}
 
 	if !buildN {
-		f, err := os.Create(buildO + ".jar")
+		f, err := os.Create(filepath.Join(buildDir,pkgs[0].Name + ".jar"))
 		if err != nil {
 			return err
 		}
@@ -155,8 +178,8 @@ func buildLinuxJar(srcDir, sdkDir string, pkgs []*packages.Package, targets []ta
 
 	args := []string{
 		"-d", dst,
-/*		"-source", javacTargetVer,
-		"-target", javacTargetVer,*/
+		/*		"-source", javacTargetVer,
+				"-target", javacTargetVer,*/
 	}
 	if bindClasspath != "" {
 		args = append(args, "-classpath", bindClasspath)
