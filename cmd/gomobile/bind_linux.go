@@ -31,9 +31,12 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 		"-lang=go,java",
 		"-outdir="+tmpdir,
 	)
+
 	cmd.Env = append(cmd.Env, "GOOS=linux")
 	cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
-	cmd.Env = append(cmd.Env, "CGO_CFLAGS=-I"+jniIncludeDir+" -I"+filepath.Join(jniIncludeDir, "linux"))
+
+	cmd.Env = append(cmd.Env, "CGO_CFLAGS=" + os.Getenv("CGO_CFLAGS") + " -I"+jniIncludeDir+" -I"+filepath.Join(jniIncludeDir, "linux"))
+	cmd.Env = append(cmd.Env, "CGO_LDFLAGS=" + os.Getenv("CGO_LDFLAGS"))
 	if len(buildTags) > 0 {
 		cmd.Args = append(cmd.Args, "-tags="+strings.Join(buildTags, ","))
 	}
@@ -81,13 +84,12 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 
 		//toolchain := ndk.Toolchain(t.arch)
 
-
 		err := goBuildAt(
 			filepath.Join(tmpdir, "src"),
 			"./gobind",
 			cmd.Env,
 			"-buildmode=c-shared",
-			"-o="+filepath.Join(buildDir,"libs", t.arch, "libgojni.so"),
+			"-o="+filepath.Join(buildDir, "libs", t.arch, "libgojni.so"),
 		)
 		if err != nil {
 			return err
@@ -99,10 +101,10 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 	if err := buildLinuxJar(jsrc, buildDir, pkgs, targets); err != nil {
 		return err
 	}
-	return buildLinuxSrcJar(filepath.Join(buildDir,pkgs[0].Name + "-sources.jar"),jsrc)
+	return buildLinuxSrcJar(filepath.Join(buildDir, pkgs[0].Name+"-sources.jar"), jsrc)
 }
 
-func buildLinuxSrcJar(output string,src string) error {
+func buildLinuxSrcJar(output string, src string) error {
 	var out io.Writer = ioutil.Discard
 	if !buildN {
 		f, err := os.Create(output)
@@ -127,7 +129,7 @@ func buildLinuxJar(srcDir, buildDir string, pkgs []*packages.Package, targets []
 	}
 
 	if !buildN {
-		f, err := os.Create(filepath.Join(buildDir,pkgs[0].Name + ".jar"))
+		f, err := os.Create(filepath.Join(buildDir, pkgs[0].Name+".jar"))
 		if err != nil {
 			return err
 		}
