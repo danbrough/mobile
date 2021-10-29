@@ -4,7 +4,7 @@
 
 package go;
 
-import android.content.Context;
+//import android.content.Context;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
@@ -40,9 +40,11 @@ public class Seq {
 	}
 
 	// setContext sets the context in the go-library to be used in RunOnJvm.
+/*
 	public static void setContext(Context context) {
 		setContext((java.lang.Object)context);
 	}
+*/
 
 	private static native void init();
 
@@ -53,7 +55,7 @@ public class Seq {
 	}
 
 	// ctx is an android.context.Context.
-	static native void setContext(java.lang.Object ctx);
+	public static native void setContext(java.lang.Object ctx);
 
 	public static void incRefnum(int refnum) {
 		tracker.incRefnum(refnum);

@@ -6,6 +6,8 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -28,7 +30,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 	)
 	cmd.Env = append(cmd.Env, "GOOS=linux")
 	cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
-	cmd.Env = append(cmd.Env, "CGO_CFLAGS=-I"+sdkDir + "/include -I" + sdkDir + "/include/linux")
+	cmd.Env = append(cmd.Env, "CGO_CFLAGS=-I"+sdkDir+"/include -I"+sdkDir+"/include/linux")
 	if len(buildTags) > 0 {
 		cmd.Args = append(cmd.Args, "-tags="+strings.Join(buildTags, ","))
 	}
@@ -88,6 +90,89 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 	}
 
 	jsrc := filepath.Join(tmpdir, "java")
+
+	if err := buildLinuxJar(jsrc, sdkDir, pkgs, targets); err != nil {
+		return err
+	}
 	return buildSrcJar(jsrc)
 }
 
+func buildLinuxJar(srcDir, sdkDir string, pkgs []*packages.Package, targets []targetInfo) (err error) {
+	var out io.Writer = ioutil.Discard
+	if buildO == "" {
+		buildO = pkgs[0].Name
+	}
+
+	if !buildN {
+		f, err := os.Create(buildO + ".jar")
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if cerr := f.Close(); err == nil {
+				err = cerr
+			}
+		}()
+		out = f
+	}
+
+	/*jarw := zip.NewWriter(out)
+	jarwcreate := func(name string) (io.Writer, error) {
+		if buildV {
+			fmt.Fprintf(os.Stderr, "aar: %s\n", name)
+		}
+		return jarw.Create(name)
+	}*/
+
+	var srcFiles []string
+	if buildN {
+		srcFiles = []string{"*.java"}
+	} else {
+		err := filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if filepath.Ext(path) == ".java" {
+				srcFiles = append(srcFiles, filepath.Join(".", path[len(srcDir):]))
+			}
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	dst := filepath.Join(tmpdir, "javac-output")
+	if !buildN {
+		if err := os.MkdirAll(dst, 0700); err != nil {
+			return err
+		}
+	}
+
+	if err != nil {
+		return err
+	}
+
+	args := []string{
+		"-d", dst,
+		"-source", javacTargetVer,
+		"-target", javacTargetVer,
+	}
+	if bindClasspath != "" {
+		args = append(args, "-classpath", bindClasspath)
+	}
+
+	args = append(args, srcFiles...)
+
+	javac := exec.Command("javac", args...)
+	javac.Dir = srcDir
+	if err := runCmd(javac); err != nil {
+		return err
+	}
+
+	if buildX {
+		printcmd("jar c -C %s .", dst)
+	}
+	return writeJar(out, dst)
+
+}
