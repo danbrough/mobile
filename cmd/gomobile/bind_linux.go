@@ -155,8 +155,8 @@ func buildLinuxJar(srcDir, sdkDir string, pkgs []*packages.Package, targets []ta
 
 	args := []string{
 		"-d", dst,
-		"-source", javacTargetVer,
-		"-target", javacTargetVer,
+/*		"-source", javacTargetVer,
+		"-target", javacTargetVer,*/
 	}
 	if bindClasspath != "" {
 		args = append(args, "-classpath", bindClasspath)
