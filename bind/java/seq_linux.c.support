@@ -6,9 +6,7 @@
 // generated gomobile_bind package and compiled along with the
 // generated binding files.
 
-#ifdef __GOBIND_ANDROID__
-#include <android/log.h>
-#endif
+#ifdef __GOBIND_LINUX__
 #include <errno.h>
 #include <jni.h>
 #include <stdint.h>
@@ -401,3 +399,5 @@ int go_seq_isinstanceof(jint refnum, jclass clazz) {
 	go_seq_pop_local_frame(env);
 	return isinst;
 }
+
+#endif
