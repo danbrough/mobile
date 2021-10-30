@@ -9,38 +9,38 @@
 //
 // In order to build this program as an Android APK, using the gomobile tool.
 //
-// See http://godoc.org/golang.org/x/mobile/cmd/gomobile to install gomobile.
+// See http://godoc.org/github.com/danbrough/mobile/cmd/gomobile to install gomobile.
 //
 // Get the basic example and use gomobile to build or install it on your device.
 //
-//   $ go get -d golang.org/x/mobile/example/basic
-//   $ gomobile build golang.org/x/mobile/example/basic # will build an APK
+//   $ go get -d github.com/danbrough/mobile/example/basic
+//   $ gomobile build github.com/danbrough/mobile/example/basic # will build an APK
 //
 //   # plug your Android device to your computer or start an Android emulator.
 //   # if you have adb installed on your machine, use gomobile install to
 //   # build and deploy the APK to an Android target.
-//   $ gomobile install golang.org/x/mobile/example/basic
+//   $ gomobile install github.com/danbrough/mobile/example/basic
 //
 // Switch to your device or emulator to start the Basic application from
 // the launcher.
 // You can also run the application on your desktop by running the command
 // below. (Note: It currently doesn't work on Windows.)
-//   $ go install golang.org/x/mobile/example/basic && basic
+//   $ go install github.com/danbrough/mobile/example/basic && basic
 package main
 
 import (
 	"encoding/binary"
 	"log"
 
-	"golang.org/x/mobile/app"
-	"golang.org/x/mobile/event/lifecycle"
-	"golang.org/x/mobile/event/paint"
-	"golang.org/x/mobile/event/size"
-	"golang.org/x/mobile/event/touch"
-	"golang.org/x/mobile/exp/app/debug"
-	"golang.org/x/mobile/exp/f32"
-	"golang.org/x/mobile/exp/gl/glutil"
-	"golang.org/x/mobile/gl"
+	"github.com/danbrough/mobile/app"
+	"github.com/danbrough/mobile/event/lifecycle"
+	"github.com/danbrough/mobile/event/paint"
+	"github.com/danbrough/mobile/event/size"
+	"github.com/danbrough/mobile/event/touch"
+	"github.com/danbrough/mobile/exp/app/debug"
+	"github.com/danbrough/mobile/exp/f32"
+	"github.com/danbrough/mobile/exp/gl/glutil"
+	"github.com/danbrough/mobile/gl"
 )
 
 var (

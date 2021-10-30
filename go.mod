@@ -1,4 +1,4 @@
-module golang.org/x/mobile
+module github.com/danbrough/mobile
 
 go 1.16
 
