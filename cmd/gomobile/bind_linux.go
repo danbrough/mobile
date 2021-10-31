@@ -6,6 +6,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/danbrough/mobile/klog"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -15,8 +16,10 @@ import (
 )
 
 func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) error {
-	if sdkDir := os.Getenv("ANDROID_HOME"); sdkDir == "" {
-		return fmt.Errorf("this command requires ANDROID_HOME environment variable (path to the Android SDK)")
+	klog.KLog.Info("goLinuxBind() gobind:%s", gobind)
+	var jdkDir string
+	if jdkDir = os.Getenv("JAVA_HOME"); jdkDir == "" {
+		return fmt.Errorf("this command requires JAVA_HOME environment variable (path to the Java SDK)")
 	}
 
 	// Run gobind to generate the bindings
@@ -25,8 +28,9 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 		"-lang=go,java",
 		"-outdir="+tmpdir,
 	)
-	cmd.Env = append(cmd.Env, "GOOS=android")
+	cmd.Env = append(cmd.Env, "GOOS=linux")
 	cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
+	cmd.Env = append(cmd.Env, "CGO_CFLAGS=" + "-I"+filepath.Join(jdkDir, "include") + " -I" + filepath.Join(jdkDir, "include","linux"))
 	if len(buildTags) > 0 {
 		cmd.Args = append(cmd.Args, "-tags="+strings.Join(buildTags, ","))
 	}
