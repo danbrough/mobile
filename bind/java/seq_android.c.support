@@ -6,7 +6,9 @@
 // generated gomobile_bind package and compiled along with the
 // generated binding files.
 
+#ifdef __GOBIND_ANDROID__
 #include <android/log.h>
+#endif 
 #include <errno.h>
 #include <jni.h>
 #include <stdint.h>
