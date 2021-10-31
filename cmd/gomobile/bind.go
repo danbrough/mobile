@@ -81,7 +81,7 @@ func runBind(cmd *command) error {
 		return fmt.Errorf(`invalid -target=%q: %v`, buildTarget, err)
 	}
 
-	if isAndroidPlatform(targets[0].platform) {
+	if isAndroidPlatform(targets[0].platform) || isLinuxPlatform(targets[0].platform){
 		if bindPrefix != "" {
 			return fmt.Errorf("-prefix is supported only for Apple targets")
 		}
@@ -125,6 +125,8 @@ func runBind(cmd *command) error {
 	switch {
 	case isAndroidPlatform(targets[0].platform):
 		return goAndroidBind(gobind, pkgs, targets)
+	case isLinuxPlatform(targets[0].platform):
+		return goLinuxBind(gobind, pkgs, targets)
 	case isApplePlatform(targets[0].platform):
 		if !xcodeAvailable() {
 			return fmt.Errorf("-target=%q requires Xcode", buildTarget)
@@ -145,7 +147,7 @@ var (
 func init() {
 	// bind command specific commands.
 	cmdBind.flag.StringVar(&bindJavaPkg, "javapkg", "",
-		"specifies custom Java package path prefix. Valid only with -target=android.")
+		"specifies custom Java package path prefix. Valid only with -target=android|linux.")
 	cmdBind.flag.StringVar(&bindPrefix, "prefix", "",
 		"custom Objective-C name prefix. Valid only with -target=ios.")
 	cmdBind.flag.StringVar(&bindClasspath, "classpath", "", "The classpath for imported Java classes. Valid only with -target=android.")

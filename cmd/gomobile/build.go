@@ -391,7 +391,8 @@ func parseBuildTarget(buildTarget string) ([]targetInfo, error) {
 			isAndroid = true
 		} else if isApplePlatform(platform) {
 			isApple = true
-		} else {
+		} else if isLinuxPlatform(platform) {
+		}  else {
 			return nil, fmt.Errorf("unsupported platform: %q", platform)
 		}
 		if isAndroid && isApple {
