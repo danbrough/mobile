@@ -30,7 +30,9 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 	)
 	cmd.Env = append(cmd.Env, "GOOS=linux")
 	cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
-	cmd.Env = append(cmd.Env, "CGO_CFLAGS=" + "-I"+filepath.Join(jdkDir, "include") + " -I" + filepath.Join(jdkDir, "include","linux"))
+	cmd.Env = append(cmd.Env, "CGO_CFLAGS="+ os.Getenv("CGO_CFLAGS") + " -I"+filepath.Join(jdkDir, "include")+" -I"+filepath.Join(jdkDir, "include", "linux"))
+	cmd.Env = append(cmd.Env, "CGO_LDFLAGS=-fPIC "+os.Getenv("CGO_LDFLAGS"))
+
 	if len(buildTags) > 0 {
 		cmd.Args = append(cmd.Args, "-tags="+strings.Join(buildTags, ","))
 	}
@@ -50,8 +52,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 		return err
 	}
 
-	androidDir := filepath.Join(tmpdir, "android")
-
+	buildDir, _ := filepath.Abs(buildO)
 	modulesUsed, err := areGoModulesUsed()
 	if err != nil {
 		return err
@@ -59,30 +60,31 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 
 	// Generate binding code and java source code only when processing the first package.
 	for _, t := range targets {
-		if err := writeGoMod(tmpdir, "android", t.arch); err != nil {
+		if err := writeGoMod(tmpdir, "linux", t.arch); err != nil {
 			return err
 		}
 
-		env := androidEnv[t.arch]
+		//env := androidEnv[t.arch]
+
 		// Add the generated packages to GOPATH for reverse bindings.
 		gopath := fmt.Sprintf("GOPATH=%s%c%s", tmpdir, filepath.ListSeparator, goEnv("GOPATH"))
-		env = append(env, gopath)
+		cmd.Env = append(cmd.Env, gopath)
 
 		// Run `go mod tidy` to force to create go.sum.
 		// Without go.sum, `go build` fails as of Go 1.16.
 		if modulesUsed {
-			if err := goModTidyAt(filepath.Join(tmpdir, "src"), env); err != nil {
+			if err := goModTidyAt(filepath.Join(tmpdir, "src"), cmd.Env); err != nil {
 				return err
 			}
 		}
 
-		toolchain := ndk.Toolchain(t.arch)
+		//toolchain := ndk.Toolchain(t.arch)
 		err := goBuildAt(
 			filepath.Join(tmpdir, "src"),
 			"./gobind",
-			env,
+			cmd.Env,
 			"-buildmode=c-shared",
-			"-o="+filepath.Join(androidDir, "src/main/jniLibs/"+toolchain.abi+"/libgojni.so"),
+			"-o="+filepath.Join(buildDir, "libs", t.arch, "libgojni.so"),
 		)
 		if err != nil {
 			return err
@@ -90,8 +92,9 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 	}
 
 	jsrc := filepath.Join(tmpdir, "java")
-	if err := buildAAR(jsrc, androidDir, pkgs, targets); err != nil {
+	/*
+		if err := buildAAR(jsrc, androidDir, pkgs, targets); err != nil {
 		return err
-	}
+	}*/
 	return buildSrcJar(jsrc)
 }

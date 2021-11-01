@@ -2,6 +2,7 @@
 last-change
 *.apk
 *.app
+*.log
 *.framework
 *.xcframework
 *.aar
