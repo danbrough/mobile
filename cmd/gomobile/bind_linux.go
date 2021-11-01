@@ -79,6 +79,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 		}
 
 		//toolchain := ndk.Toolchain(t.arch)
+		klog.KLog.Warn("calling goBuildAt()")
 		err := goBuildAt(
 			filepath.Join(tmpdir, "src"),
 			"./gobind",
