@@ -180,9 +180,9 @@ func TestRegexImportGolangXPackage(t *testing.T) {
 		want    string
 		wantLen int
 	}{
-		{"ffffffff t golang.org/x/mobile", "golang.org/x/mobile", 2},
-		{"ffffffff t github.com/example/repo/vendor/golang.org/x/mobile", "golang.org/x/mobile", 2},
-		{"ffffffff t github.com/example/golang.org/x/mobile", "", 0},
+		{"ffffffff t github.com/danbrough/mobile", "github.com/danbrough/mobile", 2},
+		{"ffffffff t github.com/example/repo/vendor/github.com/danbrough/mobile", "github.com/danbrough/mobile", 2},
+		{"ffffffff t github.com/example/github.com/danbrough/mobile", "", 0},
 		{"ffffffff t github.com/example/repo", "", 0},
 		{"ffffffff t github.com/example/repo/vendor", "", 0},
 		{"ffffffff t _github.com/danbrough/mobile/app", "github.com/danbrough/mobile/app", 2},

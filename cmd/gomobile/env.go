@@ -33,6 +33,10 @@ func isAndroidPlatform(platform string) bool {
 	return platform == "android"
 }
 
+func isLinuxPlatform(platform string) bool {
+	return platform == "linux"
+}
+
 func isApplePlatform(platform string) bool {
 	return contains(applePlatforms, platform)
 }
@@ -67,6 +71,8 @@ func platformOS(platform string) string {
 		return "linux"
 	case "android":
 		return "android"
+	case "linux":
+		return "linux"
 	case "ios", "iossimulator":
 		return "ios"
 	case "macos", "maccatalyst":
@@ -86,6 +92,8 @@ func platformTags(platform string) []string {
 		return []string{"linux"}
 	case "android":
 		return []string{"android"}
+	case "linux":
+		return []string{"linux"}
 	case "ios", "iossimulator":
 		return []string{"ios"}
 	case "macos":

@@ -20,6 +20,14 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+<<<<<<< HEAD
+=======
+
+	"github.com/danbrough/mobile/internal/importers"
+	"github.com/danbrough/mobile/internal/importers/java"
+	"github.com/danbrough/mobile/internal/importers/objc"
+	"golang.org/x/tools/go/packages"
+>>>>>>> dev
 )
 
 var (

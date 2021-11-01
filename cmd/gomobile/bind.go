@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/danbrough/mobile/klog"
 	"io"
 	"io/ioutil"
 	"os"
@@ -68,8 +69,10 @@ are shared with the build command. For documentation, see 'go help build'.
 }
 
 func runBind(cmd *command) error {
+	klog.KLog.Info("runBind() cmd:%s", cmd.Name)
 	cleanup, err := buildEnvInit()
 	if err != nil {
+		klog.KLog.Error("buildEnvInit failed: %s", err)
 		return err
 	}
 	defer cleanup()
@@ -91,7 +94,10 @@ func runBind(cmd *command) error {
 			return err
 		}
 	} else if isLinuxPlatform(targets[0].platform) {
+<<<<<<< HEAD
 
+=======
+>>>>>>> dev
 	} else {
 		if bindJavaPkg != "" {
 			return fmt.Errorf("-javapkg is supported only for android target")
@@ -150,8 +156,9 @@ var (
 
 func init() {
 	// bind command specific commands.
+	klog.KLog.Info("init()")
 	cmdBind.flag.StringVar(&bindJavaPkg, "javapkg", "",
-		"specifies custom Java package path prefix. Valid only with -target=android.")
+		"specifies custom Java package path prefix. Valid only with -target=android|linux.")
 	cmdBind.flag.StringVar(&bindPrefix, "prefix", "",
 		"custom Objective-C name prefix. Valid only with -target=ios.")
 	cmdBind.flag.StringVar(&bindClasspath, "classpath", "", "The classpath for imported Java classes. Valid only with -target=android.")

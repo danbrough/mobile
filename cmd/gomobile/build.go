@@ -84,6 +84,7 @@ func runBuild(cmd *command) (err error) {
 // runBuildImpl builds a package for mobiles based on the given commands.
 // runBuildImpl returns a built package information and an error if exists.
 func runBuildImpl(cmd *command) (*packages.Package, error) {
+<<<<<<< HEAD
   cleanup, err := buildEnvInit()
   if err != nil {
     return nil, err
@@ -173,11 +174,103 @@ func runBuildImpl(cmd *command) (*packages.Package, error) {
   }
 
   return pkg, nil
+=======
+	cleanup, err := buildEnvInit()
+	if err != nil {
+		return nil, err
+	}
+	defer cleanup()
+
+	args := cmd.flag.Args()
+
+	targets, err := parseBuildTarget(buildTarget)
+	if err != nil {
+		return nil, fmt.Errorf(`invalid -target=%q: %v`, buildTarget, err)
+	}
+
+	var buildPath string
+	switch len(args) {
+	case 0:
+		buildPath = "."
+	case 1:
+		buildPath = args[0]
+	default:
+		cmd.usage()
+		os.Exit(1)
+	}
+
+	// TODO(ydnar): this should work, unless build tags affect loading a single package.
+	// Should we try to import packages with different build tags per platform?
+	pkgs, err := packages.Load(packagesConfig(targets[0]), buildPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// len(pkgs) can be more than 1 e.g., when the specified path includes `...`.
+	if len(pkgs) != 1 {
+		cmd.usage()
+		os.Exit(1)
+	}
+
+	pkg := pkgs[0]
+
+	if pkg.Name != "main" && buildO != "" {
+		return nil, fmt.Errorf("cannot set -o when building non-main package")
+	}
+
+	var nmpkgs map[string]bool
+	switch {
+	case isAndroidPlatform(targets[0].platform):
+		if pkg.Name != "main" {
+			for _, t := range targets {
+				if err := goBuild(pkg.PkgPath, androidEnv[t.arch]); err != nil {
+					return nil, err
+				}
+			}
+			return pkg, nil
+		}
+		nmpkgs, err = goAndroidBuild(pkg, targets)
+		if err != nil {
+			return nil, err
+		}
+	case isApplePlatform(targets[0].platform):
+		if !xcodeAvailable() {
+			return nil, fmt.Errorf("-target=%s requires XCode", buildTarget)
+		}
+		if pkg.Name != "main" {
+			for _, t := range targets {
+				// Catalyst support requires iOS 13+
+				v, _ := strconv.ParseFloat(buildIOSVersion, 64)
+				if t.platform == "maccatalyst" && v < 13.0 {
+					return nil, errors.New("catalyst requires -iosversion=13 or higher")
+				}
+				if err := goBuild(pkg.PkgPath, appleEnv[t.String()]); err != nil {
+					return nil, err
+				}
+			}
+			return pkg, nil
+		}
+		if buildBundleID == "" {
+			return nil, fmt.Errorf("-target=ios requires -bundleid set")
+		}
+		nmpkgs, err = goAppleBuild(pkg, buildBundleID, targets)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if !nmpkgs["github.com/danbrough/mobile/app"] {
+		return nil, fmt.Errorf(`%s does not import "github.com/danbrough/mobile/app"`, pkg.PkgPath)
+	}
+
+	return pkg, nil
+>>>>>>> dev
 }
 
 var nmRE = regexp.MustCompile(`[0-9a-f]{8} t _?(?:.*/vendor/)?(golang.org/x.*/[^.]*)`)
 
 func extractPkgs(nm string, path string) (map[string]bool, error) {
+<<<<<<< HEAD
   if buildN {
     return map[string]bool{"github.com/danbrough/mobile/app": true}, nil
   }
@@ -207,6 +300,37 @@ func extractPkgs(nm string, path string) (map[string]bool, error) {
     return nil, fmt.Errorf("%s %s: %v", nm, path, err)
   }
   return nmpkgs, nil
+=======
+	if buildN {
+		return map[string]bool{"github.com/danbrough/mobile/app": true}, nil
+	}
+	r, w := io.Pipe()
+	cmd := exec.Command(nm, path)
+	cmd.Stdout = w
+	cmd.Stderr = os.Stderr
+
+	nmpkgs := make(map[string]bool)
+	errc := make(chan error, 1)
+	go func() {
+		s := bufio.NewScanner(r)
+		for s.Scan() {
+			if res := nmRE.FindStringSubmatch(s.Text()); res != nil {
+				nmpkgs[res[1]] = true
+			}
+		}
+		errc <- s.Err()
+	}()
+
+	err := cmd.Run()
+	w.Close()
+	if err != nil {
+		return nil, fmt.Errorf("%s %s: %v", nm, path, err)
+	}
+	if err := <-errc; err != nil {
+		return nil, fmt.Errorf("%s %s: %v", nm, path, err)
+	}
+	return nmpkgs, nil
+>>>>>>> dev
 }
 
 var xout io.Writer = os.Stderr
@@ -360,6 +484,7 @@ func goModTidyAt(at string, env []string) error {
 //    ios,iossimulator,maccatalyst
 //    macos/amd64
 func parseBuildTarget(buildTarget string) ([]targetInfo, error) {
+<<<<<<< HEAD
   if buildTarget == "" {
     return nil, fmt.Errorf(`invalid target ""`)
   }
@@ -417,6 +542,65 @@ func parseBuildTarget(buildTarget string) ([]targetInfo, error) {
   }
 
   return targets, nil
+=======
+	if buildTarget == "" {
+		return nil, fmt.Errorf(`invalid target ""`)
+	}
+
+	targets := []targetInfo{}
+	targetsAdded := make(map[targetInfo]bool)
+
+	addTarget := func(platform, arch string) {
+		t := targetInfo{platform, arch}
+		if targetsAdded[t] {
+			return
+		}
+		targets = append(targets, t)
+		targetsAdded[t] = true
+	}
+
+	addPlatform := func(platform string) {
+		for _, arch := range platformArchs(platform) {
+			addTarget(platform, arch)
+		}
+	}
+
+	var isAndroid, isApple bool
+	for _, target := range strings.Split(buildTarget, ",") {
+		tuple := strings.SplitN(target, "/", 2)
+		platform := tuple[0]
+		hasArch := len(tuple) == 2
+
+		if isAndroidPlatform(platform) {
+			isAndroid = true
+		} else if isApplePlatform(platform) {
+			isApple = true
+		} else if isLinuxPlatform(platform) {
+		}  else {
+			return nil, fmt.Errorf("unsupported platform: %q", platform)
+		}
+		if isAndroid && isApple {
+			return nil, fmt.Errorf(`cannot mix android and Apple platforms`)
+		}
+
+		if hasArch {
+			arch := tuple[1]
+			if !isSupportedArch(platform, arch) {
+				return nil, fmt.Errorf(`unsupported platform/arch: %q`, target)
+			}
+			addTarget(platform, arch)
+		} else {
+			addPlatform(platform)
+		}
+	}
+
+	// Special case to build iossimulator if -target=ios
+	if buildTarget == "ios" {
+		addPlatform("iossimulator")
+	}
+
+	return targets, nil
+>>>>>>> dev
 }
 
 type targetInfo struct {

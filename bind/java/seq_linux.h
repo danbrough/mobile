@@ -5,15 +5,25 @@
 #ifndef __GO_SEQ_ANDROID_HDR__
 #define __GO_SEQ_ANDROID_HDR__
 
+<<<<<<< HEAD:bind/java/seq_linux.h
 #ifdef __GOBIND_ANDROID__
 #include <android/log.h>
 #endif
+=======
+#include <stdint.h>
+
+
+>>>>>>> dev:bind/java/seq_android.h
 // For abort()
 #include <stdlib.h>
 #include <jni.h>
 #include <stdint.h>
 
 #ifdef __GOBIND_ANDROID__
+<<<<<<< HEAD:bind/java/seq_linux.h
+=======
+#include <android/log.h>
+>>>>>>> dev:bind/java/seq_android.h
 #define LOG_INFO(...) __android_log_print(ANDROID_LOG_INFO, "go/Seq", __VA_ARGS__)
 #define LOG_FATAL(...)                                             \
   {                                                                \
@@ -21,10 +31,17 @@
     abort();                                                       \
   }
 #else
+<<<<<<< HEAD:bind/java/seq_linux.h
 #define LOG_INFO(fmt,...) printf( "JNI: " fmt "\n",##__VA_ARGS__)
 #define LOG_FATAL(fmt,...)                                             \
   {                                                                \
     printf("JNI:FATAL:" fmt "\n",##__VA_ARGS__); \
+=======
+#define LOG_INFO(fmt,...) printf( "JNI:INFO " fmt "\n",##__VA_ARGS__)
+#define LOG_FATAL(fmt,...)                                         \
+  {                                                                \
+    printf("JNI:FATAL:" fmt "\n",##__VA_ARGS__);                   \
+>>>>>>> dev:bind/java/seq_android.h
     abort();                                                       \
   }
 #endif

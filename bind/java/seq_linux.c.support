@@ -59,6 +59,9 @@ static JNIEnv *go_seq_get_thread_env(void) {
 		}
 		#ifdef __GOBIND_ANDROID__
 		if ((*jvm)->AttachCurrentThread(jvm, &env, NULL) != JNI_OK) {
+		#else
+		if ((*jvm)->AttachCurrentThread(jvm, (void**) &env, NULL) != JNI_OK) {
+		#endif
 			LOG_FATAL("failed to attach current thread");
 		}
 		#else

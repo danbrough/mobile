@@ -115,7 +115,7 @@ func TestGobind(t *testing.T) { packagestest.TestAll(t, testGobind) }
 func testGobind(t *testing.T, exporter packagestest.Exporter) {
 	_, javapErr := exec.LookPath("javap")
 	exported := packagestest.Export(t, exporter, []packagestest.Module{{
-		Name:  "golang.org/x/mobile",
+		Name:  "github.com/danbrough/mobile",
 		Files: packagestest.MustCopyFileTree("../.."),
 	}})
 	defer exported.Cleanup()
@@ -156,8 +156,8 @@ type Struct struct{
 			},
 		},
 		{
-			// gobind requires golang.org/x/mobile to generate code for reverse bindings.
-			Name:  "golang.org/x/mobile",
+			// gobind requires github.com/danbrough/mobile to generate code for reverse bindings.
+			Name:  "github.com/danbrough/mobile",
 			Files: packagestest.MustCopyFileTree("../.."),
 		},
 	})
@@ -186,7 +186,7 @@ func BenchmarkGobind(b *testing.B) {
 func benchmarkGobind(b *testing.B, exporter packagestest.Exporter) {
 	_, javapErr := exec.LookPath("javap")
 	exported := packagestest.Export(b, exporter, []packagestest.Module{{
-		Name:  "golang.org/x/mobile",
+		Name:  "github.com/danbrough/mobile",
 		Files: packagestest.MustCopyFileTree("../.."),
 	}})
 	defer exported.Cleanup()

@@ -6,12 +6,17 @@ package main
 
 import (
 	"fmt"
+<<<<<<< HEAD
 	"golang.org/x/tools/go/packages"
+=======
+	"github.com/danbrough/mobile/klog"
+>>>>>>> dev
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+<<<<<<< HEAD
 	"runtime"
 	"strings"
 )
@@ -33,6 +38,19 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 
 	println("buildO:", buildO, "pkgName:", pkgName)
 
+=======
+	"strings"
+
+	"golang.org/x/tools/go/packages"
+)
+
+func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) error {
+	klog.KLog.Info("goLinuxBind() gobind:%s", gobind)
+	var jdkDir string
+	if jdkDir = os.Getenv("JAVA_HOME"); jdkDir == "" {
+		return fmt.Errorf("this command requires JAVA_HOME environment variable (path to the Java SDK)")
+	}
+>>>>>>> dev
 
 	// Run gobind to generate the bindings
 	cmd := exec.Command(
@@ -40,6 +58,7 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 		"-lang=go,java",
 		"-outdir="+tmpdir,
 	)
+<<<<<<< HEAD
 
 	var javaHome *string
 
@@ -67,6 +86,13 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 
 	cmd.Env = append(cmd.Env, "GOOS=linux")
 	cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
+=======
+	cmd.Env = append(cmd.Env, "GOOS=linux")
+	cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
+	cmd.Env = append(cmd.Env, "CGO_CFLAGS="+os.Getenv("CGO_CFLAGS")+" -I"+filepath.Join(jdkDir, "include")+" -I"+filepath.Join(jdkDir, "include", "linux"))
+	cmd.Env = append(cmd.Env, "CGO_LDFLAGS=-fPIC "+os.Getenv("CGO_LDFLAGS"))
+
+>>>>>>> dev
 	if len(buildTags) > 0 {
 		cmd.Args = append(cmd.Args, "-tags="+strings.Join(buildTags, ","))
 	}
@@ -86,12 +112,18 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 		return err
 	}
 
+<<<<<<< HEAD
 	//linuxDir := filepath.Join(tmpdir, "linux")
 
 	modulesUsed, err := areGoModulesUsed()
 	if err != nil {
 		return err
 	}
+=======
+	buildDir, _ := filepath.Abs(buildO)
+	pkgName := pkgs[0].Name
+	modulesUsed, err := areGoModulesUsed()
+>>>>>>> dev
 
 	// Generate binding code and java source code only when processing the first package.
 	for _, t := range targets {
@@ -99,32 +131,55 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 			return err
 		}
 
+<<<<<<< HEAD
 		env := androidEnv[t.arch]
 		// Add the generated packages to GOPATH for reverse bindings.
 		gopath := fmt.Sprintf("GOPATH=%s%c%s", tmpdir, filepath.ListSeparator, goEnv("GOPATH"))
 		env = append(env, gopath)
+=======
+		//env := androidEnv[t.arch]
+
+		// Add the generated packages to GOPATH for reverse bindings.
+		gopath := fmt.Sprintf("GOPATH=%s%c%s", tmpdir, filepath.ListSeparator, goEnv("GOPATH"))
+		cmd.Env = append(cmd.Env, gopath)
+>>>>>>> dev
 
 		// Run `go mod tidy` to force to create go.sum.
 		// Without go.sum, `go build` fails as of Go 1.16.
 		if modulesUsed {
+<<<<<<< HEAD
 			if err := goModTidyAt(filepath.Join(tmpdir, "src"), env); err != nil {
+=======
+			if err := goModTidyAt(filepath.Join(tmpdir, "src"), cmd.Env); err != nil {
+>>>>>>> dev
 				return err
 			}
 		}
 
 		//toolchain := ndk.Toolchain(t.arch)
+<<<<<<< HEAD
 		err := goBuildAt(
 			filepath.Join(tmpdir, "src"),
 			"./gobind",
 			env,
 			"-buildmode=c-shared",
 			"-o="+filepath.Join(buildO, "libs",t.arch,"libgojni.so"),
+=======
+		klog.KLog.Warn("calling goBuildAt()")
+		err := goBuildAt(
+			filepath.Join(tmpdir, "src"),
+			"./gobind",
+			cmd.Env,
+			"-buildmode=c-shared",
+			"-o="+filepath.Join(buildDir, "libs", t.arch, "libgojni.so"),
+>>>>>>> dev
 		)
 		if err != nil {
 			return err
 		}
 	}
 
+<<<<<<< HEAD
 
 	jsrc := filepath.Join(tmpdir, "java")
 	/*if err := buildAAR(jsrc, linuxDir, pkgs, targets); err != nil {
@@ -138,6 +193,10 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 			}
 			return jarw.Create(name)
 		}*/
+=======
+	jsrc := filepath.Join(tmpdir, "java")
+
+>>>>>>> dev
 	err = buildLinuxSrcJar(jsrc, filepath.Join(buildO, pkgName+"-sources.jar"))
 	if err != nil {
 		return err
@@ -161,7 +220,11 @@ func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) 
 }
 
 func buildLinuxJar(w io.Writer, srcDir string) error {
+<<<<<<< HEAD
 	println("buildLinuxJar() srcDir:",srcDir)
+=======
+	println("buildLinuxJar() srcDir:", srcDir)
+>>>>>>> dev
 	var srcFiles []string
 	if buildN {
 		srcFiles = []string{"*.java"}
@@ -189,12 +252,20 @@ func buildLinuxJar(w io.Writer, srcDir string) error {
 
 	//bClspath := bindBootClasspath
 
+<<<<<<< HEAD
 
 	args := []string{
 		"-d", dst,
 		//"-source", javacTargetVer,
 	//	"-target", javacTargetVer,
 	//	"-bootclasspath", bClspath,
+=======
+	args := []string{
+		"-d", dst,
+		//"-source", javacTargetVer,
+		//      "-target", javacTargetVer,
+		//      "-bootclasspath", bClspath,
+>>>>>>> dev
 	}
 	if bindClasspath != "" {
 		args = append(args, "-classpath", bindClasspath)

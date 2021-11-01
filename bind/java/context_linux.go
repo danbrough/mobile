@@ -10,7 +10,12 @@ import "C"
 
 import (
 	"unsafe"
+<<<<<<< HEAD:bind/java/context_linux.go
 	"github.com/danbrough/internal/mobileinit"
+=======
+
+	"github.com/danbrough/mobile/internal/mobileinit"
+>>>>>>> dev:bind/java/context_android.go
 )
 
 //export setContext
