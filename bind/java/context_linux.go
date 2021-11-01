@@ -4,7 +4,6 @@
 
 package java // import "github.com/danbrough/mobile/bind/java"
 
-// #cgo android LDFLAGS: -llog
 //
 //#include <jni.h>
 import "C"

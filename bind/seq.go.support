@@ -10,6 +10,7 @@ package main
 
 // #cgo linux && !android CFLAGS: -D__GOBIND_LINUX__
 // #cgo android CFLAGS: -D__GOBIND_ANDROID__
+// #cgo linux CFLAGS: -D__GOBIND_LINUX__
 // #cgo darwin CFLAGS: -D__GOBIND_DARWIN__
 // #include <stdlib.h>
 // #include "seq.h"
