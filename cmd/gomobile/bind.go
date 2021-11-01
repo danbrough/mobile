@@ -79,8 +79,6 @@ func runBind(cmd *command) error {
 
 	args := cmd.flag.Args()
 
-	println("runBind() name:", cmd.Name)
-
 	targets, err := parseBuildTarget(buildTarget)
 	if err != nil {
 		return fmt.Errorf(`invalid -target=%q: %v`, buildTarget, err)
@@ -94,10 +92,6 @@ func runBind(cmd *command) error {
 			return err
 		}
 	} else if isLinuxPlatform(targets[0].platform) {
-<<<<<<< HEAD
-
-=======
->>>>>>> dev
 	} else {
 		if bindJavaPkg != "" {
 			return fmt.Errorf("-javapkg is supported only for android target")

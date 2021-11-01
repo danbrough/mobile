@@ -19,15 +19,9 @@ var (
 
 	appleEnv map[string][]string
 
-	linuxEnv map[string][]string
-
 	androidArmNM string
 	appleNM      string
 )
-
-func isLinuxPlatform(platform string) bool {
-	return platform == "linux"
-}
 
 func isAndroidPlatform(platform string) bool {
 	return platform == "android"
@@ -67,8 +61,6 @@ func isSupportedArch(platform, arch string) bool {
 // platformOS returns the correct GOOS value for platform.
 func platformOS(platform string) string {
 	switch platform {
-	case "linux":
-		return "linux"
 	case "android":
 		return "android"
 	case "linux":
@@ -88,8 +80,6 @@ func platformOS(platform string) string {
 
 func platformTags(platform string) []string {
 	switch platform {
-	case "linux":
-		return []string{"linux"}
 	case "android":
 		return []string{"android"}
 	case "linux":
@@ -157,12 +147,10 @@ func buildEnvInit() (cleanup func(), err error) {
 		tmpdir = "$WORK"
 		cleanupFn = func() {}
 	} else {
-
 		tmpdir, err = ioutil.TempDir("", "gomobile-work-")
 		if err != nil {
 			return nil, err
 		}
-
 	}
 	if buildX {
 		fmt.Fprintln(xout, "WORK="+tmpdir)
@@ -177,7 +165,6 @@ func buildEnvInit() (cleanup func(), err error) {
 
 func envInit() (err error) {
 	// Setup the cross-compiler environments.
-
 	if ndkRoot, err := ndkRoot(); err == nil {
 		androidEnv = make(map[string][]string)
 		if buildAndroidAPI < minAndroidAPI {
@@ -212,22 +199,6 @@ func envInit() (err error) {
 				androidEnv[arch] = append(androidEnv[arch], "GOARM=7")
 			}
 		}
-
-		linuxEnv = make(map[string][]string)
-
-		for arch, _ := range ndk {
-			linuxEnv[arch] = []string{
-				"GOOS=linux",
-				"GOARCH=" + arch,
-				"CC=/usr/bin/clang",
-				"CXX=/usr/bin/clang++",
-				"CGO_ENABLED=1",
-			}
-			if arch == "arm" {
-				linuxEnv[arch] = append(linuxEnv[arch], "GOARM=7")
-			}
-		}
-
 	}
 
 	if !xcodeAvailable() {
@@ -319,7 +290,6 @@ func envInit() (err error) {
 }
 
 func ndkRoot() (string, error) {
-	println("ndkRoot()")
 	if buildN {
 		return "$NDK_PATH", nil
 	}
