@@ -8,7 +8,6 @@ package main
 // copied into the generated main package, and compiled along
 // with the bindings.
 
-// #cgo linux && !android CFLAGS: -D__GOBIND_LINUX__
 // #cgo android CFLAGS: -D__GOBIND_ANDROID__
 // #cgo linux CFLAGS: -D__GOBIND_LINUX__
 // #cgo darwin CFLAGS: -D__GOBIND_DARWIN__
