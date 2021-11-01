@@ -7,6 +7,7 @@ package mobileinit
 /*
 #include <jni.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 static char* lockJNI(JavaVM *vm, uintptr_t* envp, int* attachedp) {
 	JNIEnv* env;

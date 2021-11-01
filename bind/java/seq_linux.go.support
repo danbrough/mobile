@@ -17,7 +17,7 @@ package main
 //#include <jni.h>
 //#include <stdint.h>
 //#include <stdlib.h>
-//#include "seq_android.h"
+//#include "seq_linux.h"
 import "C"
 import (
 	"unsafe"

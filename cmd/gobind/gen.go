@@ -69,12 +69,12 @@ func genPkg(lang string, p *types.Package, astFiles []*ast.File, allPkg []*types
 			closer()
 		}
 		buf.Reset()
-		w, closer = writer(filepath.Join("src", "gobind", pname+"_android.c"))
+		w, closer = writer(filepath.Join("src", "gobind", pname+"_linux.c"))
 		processErr(g.GenC())
 		io.Copy(w, &buf)
 		closer()
 		buf.Reset()
-		w, closer = writer(filepath.Join("src", "gobind", pname+"_android.h"))
+		w, closer = writer(filepath.Join("src", "gobind", pname+"_linux.h"))
 		processErr(g.GenH())
 		io.Copy(w, &buf)
 		closer()
@@ -110,9 +110,9 @@ func genPkg(lang string, p *types.Package, astFiles []*ast.File, allPkg []*types
 				errorf("unable to import bind/java: %v", err)
 				return
 			}
-			copyFile(filepath.Join("src", "gobind", "seq_android.c"), filepath.Join(javaDir, "seq_android.c.support"))
-			copyFile(filepath.Join("src", "gobind", "seq_android.go"), filepath.Join(javaDir, "seq_android.go.support"))
-			copyFile(filepath.Join("src", "gobind", "seq_android.h"), filepath.Join(javaDir, "seq_android.h"))
+			copyFile(filepath.Join("src", "gobind", "seq_linux.c"), filepath.Join(javaDir, "seq_linux.c.support"))
+			copyFile(filepath.Join("src", "gobind", "seq_linux.go"), filepath.Join(javaDir, "seq_linux.go.support"))
+			copyFile(filepath.Join("src", "gobind", "seq_linux.h"), filepath.Join(javaDir, "seq_linux.h"))
 		}
 	case "go":
 		w, closer := writer(filepath.Join("src", "gobind", fname))
@@ -178,7 +178,7 @@ func genPkgH(w io.Writer, pname string) {
 #include "%[1]s_android.h"
 #else
 #ifdef __GOBIND_LINUX__
-#include "%[1]s_android.h"
+#include "%[1]s_linux.h"
 #endif
 #endif
 #ifdef __GOBIND_DARWIN__
