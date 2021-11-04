@@ -7,17 +7,13 @@ package go;
 //import android.content.Context;
 
 import java.lang.ref.PhantomReference;
-import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.IdentityHashMap;
 import java.util.logging.Logger;
-
-import go.Universe;
 
 // Seq is a sequence of machine-dependent encoded values.
 // Used by automatically generated language bindings to talk to Go.
