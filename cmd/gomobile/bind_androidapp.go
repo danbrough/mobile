@@ -7,6 +7,7 @@ package main
 import (
 	"archive/zip"
 	"fmt"
+	"github.com/danbrough/mobile/klog"
 	"io"
 	"io/ioutil"
 	"os"
@@ -19,6 +20,7 @@ import (
 )
 
 func goAndroidBind(gobind string, pkgs []*packages.Package, targets []targetInfo) error {
+	klog.KLog.Info("goAndroidBind()")
 	if sdkDir := os.Getenv("ANDROID_HOME"); sdkDir == "" {
 		return fmt.Errorf("this command requires ANDROID_HOME environment variable (path to the Android SDK)")
 	}

@@ -217,10 +217,23 @@ func writeFile(filename string, generate func(io.Writer) error) error {
 	return generate(f)
 }
 
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
 func packagesConfig(t targetInfo) *packages.Config {
 	config := &packages.Config{}
-	// Add CGO_ENABLED=1 explicitly since Cgo is disabled when GOOS is different from host OS.
+
 	config.Env = append(os.Environ(), "GOARCH="+t.arch, "GOOS="+platformOS(t.platform), "CGO_ENABLED=1")
+
+
+	// Add CGO_ENABLED=1 explicitly since Cgo is disabled when GOOS is different from host OS.
+
 	tags := append(buildTags[:], platformTags(t.platform)...)
 
 	if len(tags) > 0 {

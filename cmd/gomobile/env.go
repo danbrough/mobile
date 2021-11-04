@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/danbrough/mobile/klog"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -117,6 +118,7 @@ func contains(haystack []string, needle string) bool {
 }
 
 func buildEnvInit() (cleanup func(), err error) {
+	klog.KLog.Info("buildEnvInit()")
 	// Find gomobilepath.
 	gopath := goEnv("GOPATH")
 	for _, p := range filepath.SplitList(gopath) {
@@ -165,14 +167,31 @@ func buildEnvInit() (cleanup func(), err error) {
 
 func envInit() (err error) {
 	// Setup the cross-compiler environments.
+	klog.KLog.Info("envInit()")
+	/*	isAndroid := platformOS(t.platform) == "android"
+		klog.KLog.Trace("isAndroid: %t  buildTagsuseOpenssl: %t", isAndroid, useOpenssl)
+		if !useOpenssl {
+			klog.KLog.Warn("Not using openssl. Consider adding -flags=openssl")
+		}
+	*/
+	useOpenssl := stringInSlice("openssl", buildTags)
+	sslLibsDir := os.Getenv("OPENSSL_LIBS")
+	if useOpenssl {
+		if sslLibsDir == "" {
+			klog.KLog.Warn("OPENSSL_LIBS should be set if compiling for android.")
+		}
+	}
+
 	if ndkRoot, err := ndkRoot(); err == nil {
 		androidEnv = make(map[string][]string)
 		if buildAndroidAPI < minAndroidAPI {
 			return fmt.Errorf("gomobile requires Android API level >= %d", minAndroidAPI)
 		}
 		for arch, toolchain := range ndk {
+			klog.KLog.Debug("arch: %s abi:%s", arch, toolchain.abi)
 			clang := toolchain.Path(ndkRoot, "clang")
 			clangpp := toolchain.Path(ndkRoot, "clang++")
+			klog.KLog.Trace("arch: %s clang: %s", arch, clang)
 			if !buildN {
 				tools := []string{clang, clangpp}
 				if runtime.GOOS == "windows" {
@@ -195,6 +214,11 @@ func envInit() (err error) {
 				"CXX=" + clangpp,
 				"CGO_ENABLED=1",
 			}
+
+			if useOpenssl && sslLibsDir != "" {
+				androidEnv[arch] = append(androidEnv[arch],"CGO_CFLAGS=-I" + sslLibsDir +"/" + toolchain.abi + "/include","CGO_LDFLAGS=-L" + sslLibsDir +"/" + toolchain.abi + "/lib")
+			}
+
 			if arch == "arm" {
 				androidEnv[arch] = append(androidEnv[arch], "GOARM=7")
 			}
