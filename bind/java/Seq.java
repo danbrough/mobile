@@ -24,6 +24,12 @@ import go.Universe;
 public class Seq {
 	private static Logger log = Logger.getLogger("GoSeq");
 
+	@FunctionalInterface
+	public interface NativeLoader {
+		void loadLibrary(String libName);
+	}
+
+	public static NativeLoader nativeLoader = System::loadLibrary;
 	// also known to bind/seq/ref.go and bind/objc/seq_darwin.m
 	private static final int NULL_REFNUM = 41;
 
@@ -34,7 +40,7 @@ public class Seq {
 	private static final GoRefQueue goRefQueue = new GoRefQueue();
 
 	static {
-		System.loadLibrary("gojni");
+		nativeLoader.loadLibrary("gojni");
 		init();
 		Universe.touch();
 	}
