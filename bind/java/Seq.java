@@ -36,7 +36,8 @@ public class Seq {
 	private static final GoRefQueue goRefQueue = new GoRefQueue();
 
 	static {
-		nativeLoader.loadLibrary("gojni");
+		//nativeLoader.loadLibrary("gojni");
+		System.out.println("Seq.init()");
 		init();
 		Universe.touch();
 	}
