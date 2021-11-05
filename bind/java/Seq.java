@@ -18,14 +18,8 @@ import java.util.logging.Logger;
 // Seq is a sequence of machine-dependent encoded values.
 // Used by automatically generated language bindings to talk to Go.
 public class Seq {
-	private static Logger log = Logger.getLogger("GoSeq");
+	private static final Logger log = Logger.getLogger("GoSeq");
 
-	@FunctionalInterface
-	public interface NativeLoader {
-		void loadLibrary(String libName);
-	}
-
-	public static NativeLoader nativeLoader = System::loadLibrary;
 	// also known to bind/seq/ref.go and bind/objc/seq_darwin.m
 	private static final int NULL_REFNUM = 41;
 
@@ -37,7 +31,6 @@ public class Seq {
 
 	static {
 		//nativeLoader.loadLibrary("gojni");
-		System.out.println("Seq.init()");
 		init();
 		Universe.touch();
 	}
@@ -50,7 +43,8 @@ public class Seq {
 	private static native void init();
 
 	// Empty method to run class initializer
-	public static void touch() {}
+	public static void touch() {
+	}
 
 	private Seq() {
 	}
@@ -120,10 +114,12 @@ public class Seq {
 		// invalidating it before being translated on the Go side.
 		int incRefnum();
 	}
+
 	// A Proxy is a Java object that proxies a Go object. Proxies, unlike
 	// GoObjects, are unwrapped to their Go counterpart when deserialized
 	// in Go.
-	public interface Proxy extends GoObject {}
+	public interface Proxy extends GoObject {
+	}
 
 	// A Ref represents an instance of a Java object passed back and forth
 	// across the language boundary.
@@ -180,7 +176,7 @@ public class Seq {
 				return NULL_REFNUM;
 			}
 			if (o instanceof Proxy) {
-				return ((Proxy)o).incRefnum();
+				return ((Proxy) o).incRefnum();
 			}
 			Integer refnumObj = javaRefs.get(o);
 			if (refnumObj == null) {
@@ -203,7 +199,7 @@ public class Seq {
 		synchronized void incRefnum(int refnum) {
 			Ref ref = javaObjs.get(refnum);
 			if (ref == null) {
-				throw new RuntimeException("referenced Java object is not found: refnum="+refnum);
+				throw new RuntimeException("referenced Java object is not found: refnum=" + refnum);
 			}
 			ref.inc();
 		}
@@ -216,7 +212,7 @@ public class Seq {
 			if (refnum <= 0) {
 				// We don't keep track of the Go object.
 				// This must not happen.
-				log.severe("dec request for Go object "+ refnum);
+				log.severe("dec request for Go object " + refnum);
 				return;
 			}
 			if (refnum == Seq.nullRef.refnum) {
@@ -225,7 +221,7 @@ public class Seq {
 			// Java objects are removed on request of Go.
 			Ref obj = javaObjs.get(refnum);
 			if (obj == null) {
-				throw new RuntimeException("referenced Java object is not found: refnum="+refnum);
+				throw new RuntimeException("referenced Java object is not found: refnum=" + refnum);
 			}
 			obj.refcnt--;
 			if (obj.refcnt <= 0) {
@@ -244,7 +240,7 @@ public class Seq {
 			}
 			Ref ref = javaObjs.get(refnum);
 			if (ref == null) {
-				throw new RuntimeException("unknown java Ref: "+refnum);
+				throw new RuntimeException("unknown java Ref: " + refnum);
 			}
 			return ref;
 		}
@@ -263,10 +259,11 @@ public class Seq {
 
 		GoRefQueue() {
 			Thread daemon = new Thread(new Runnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					while (true) {
 						try {
-							GoRef ref = (GoRef)remove();
+							GoRef ref = (GoRef) remove();
 							refs.remove(ref);
 							destroyRef(ref.refnum);
 							ref.clear();
@@ -306,7 +303,8 @@ public class Seq {
 		private int[] keys = new int[16];
 		private Ref[] objs = new Ref[16];
 
-		RefMap() {}
+		RefMap() {
+		}
 
 		Ref get(int key) {
 			int i = Arrays.binarySearch(keys, 0, next, key);
@@ -328,7 +326,7 @@ public class Seq {
 
 		void put(int key, Ref obj) {
 			if (obj == null) {
-				throw new RuntimeException("put a null ref (with key "+key+")");
+				throw new RuntimeException("put a null ref (with key " + key + ")");
 			}
 			int i = Arrays.binarySearch(keys, 0, next, key);
 			if (i >= 0) {
@@ -337,7 +335,7 @@ public class Seq {
 					live++;
 				}
 				if (objs[i] != obj) {
-					throw new RuntimeException("replacing an existing ref (with key "+key+")");
+					throw new RuntimeException("replacing an existing ref (with key " + key + ")");
 				}
 				return;
 			}
@@ -348,8 +346,8 @@ public class Seq {
 			i = ~i;
 			if (i < next) {
 				// Insert, shift everything afterwards down.
-				System.arraycopy(keys, i, keys, i+1, next-i);
-				System.arraycopy(objs, i, objs, i+1, next-i);
+				System.arraycopy(keys, i, keys, i + 1, next - i);
+				System.arraycopy(objs, i, objs, i + 1, next - i);
 			}
 			keys[i] = key;
 			objs[i] = obj;
@@ -361,10 +359,10 @@ public class Seq {
 			// Compact and (if necessary) grow backing store.
 			int[] newKeys;
 			Ref[] newObjs;
-			int len = 2*roundPow2(live);
+			int len = 2 * roundPow2(live);
 			if (len > keys.length) {
-				newKeys = new int[keys.length*2];
-				newObjs = new Ref[objs.length*2];
+				newKeys = new int[keys.length * 2];
+				newObjs = new Ref[objs.length * 2];
 			} else {
 				newKeys = keys;
 				newObjs = objs;
@@ -388,7 +386,7 @@ public class Seq {
 			next = j;
 
 			if (live != next) {
-				throw new RuntimeException("bad state: live="+live+", next="+next);
+				throw new RuntimeException("bad state: live=" + live + ", next=" + next);
 			}
 		}
 
