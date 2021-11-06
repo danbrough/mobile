@@ -91,6 +91,7 @@ func runBind(cmd *command) error {
 		if _, err := ndkRoot(); err != nil {
 			return err
 		}
+
 	} else if isLinuxPlatform(targets[0].platform) {
 	} else {
 		if bindJavaPkg != "" {

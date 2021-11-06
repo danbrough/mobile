@@ -167,7 +167,7 @@ func buildEnvInit() (cleanup func(), err error) {
 
 func envInit() (err error) {
 	// Setup the cross-compiler environments.
-	klog.KLog.Info("envInit()")
+	klog.KLog.Info("envInit() buildTarget:%s",buildTarget)
 	/*	isAndroid := platformOS(t.platform) == "android"
 		klog.KLog.Trace("isAndroid: %t  buildTagsuseOpenssl: %t", isAndroid, useOpenssl)
 		if !useOpenssl {
@@ -176,11 +176,6 @@ func envInit() (err error) {
 	*/
 	useOpenssl := stringInSlice("openssl", buildTags)
 	sslLibsDir := os.Getenv("OPENSSL_LIBS")
-	if useOpenssl {
-		if sslLibsDir == "" {
-			klog.KLog.Warn("OPENSSL_LIBS should be set if compiling for android.")
-		}
-	}
 
 	if ndkRoot, err := ndkRoot(); err == nil {
 		androidEnv = make(map[string][]string)
