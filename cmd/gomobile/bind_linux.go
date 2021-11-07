@@ -35,7 +35,14 @@ func goWindowsBind(gobind string, pkgs []*packages.Package, targets []targetInfo
 	cmd.Env = append(cmd.Env, "CC=/usr/bin/x86_64-w64-mingw32-cc")
 	cmd.Env = append(cmd.Env, "CXX=/usr/bin/x86_64-w64-mingw32-c++")
 
-	cmd.Env = append(cmd.Env, "CGO_CFLAGS="+os.Getenv("CGO_CFLAGS")+" -I"+filepath.Join(jdkDir, "include")+" -I"+filepath.Join(jdkDir, "include", "win32"))
+	jdkIncludes := " -I" + filepath.Join(jdkDir, "include")
+	w32Includes := filepath.Join(jdkDir, "include", "win32")
+	if _, err := os.Stat(w32Includes); err == nil {
+		jdkIncludes = jdkIncludes + " -I" + w32Includes
+	} else {
+		jdkIncludes = jdkIncludes + " -I" + filepath.Join(jdkIncludes,"linux")
+	}
+	cmd.Env = append(cmd.Env, "CGO_CFLAGS="+os.Getenv("CGO_CFLAGS")+jdkIncludes)
 	cmd.Env = append(cmd.Env, "CGO_LDFLAGS=-static -fPIC "+os.Getenv("CGO_LDFLAGS"))
 
 	if len(buildTags) > 0 {
@@ -118,7 +125,6 @@ func goWindowsBind(gobind string, pkgs []*packages.Package, targets []targetInfo
 	return buildLinuxJar(out, jsrc)
 
 }
-
 
 func goLinuxBind(gobind string, pkgs []*packages.Package, targets []targetInfo) error {
 	klog.KLog.Info("goLinuxBind() gobind:%s", gobind)
