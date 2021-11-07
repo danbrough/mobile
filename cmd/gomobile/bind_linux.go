@@ -35,8 +35,18 @@ func goWindowsBind(gobind string, pkgs []*packages.Package, targets []targetInfo
 	)
 	cmd.Env = append(cmd.Env, "GOOS=windows")
 	cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
-	cmd.Env = append(cmd.Env, "CC=/usr/bin/x86_64-w64-mingw32-cc")
-	cmd.Env = append(cmd.Env, "CXX=/usr/bin/x86_64-w64-mingw32-c++")
+
+	gcc := os.Getenv("CC")
+	if gcc == "" {
+		gcc = "/usr/bin/x86_64-w64-mingw32-cc"
+		klog.KLog.Warn("CC not set to mingw32 gcc. Using default: %s",gcc)
+	}
+	gpp := os.Getenv("CXX")
+	if gpp == "" {
+		gpp = "/usr/bin/x86_64-w64-mingw32-c++"
+	}
+	cmd.Env = append(cmd.Env, "CC=" + gcc)
+	cmd.Env = append(cmd.Env, "CXX=" + gpp)
 
 	jdkIncludes := " -I" + filepath.Join(jdkDir, "include")
 	w32Includes := filepath.Join(jdkDir, "include", "win32")
