@@ -10,6 +10,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/danbrough/mobile/klog"
 	"io"
 	"os"
 	"os/exec"
@@ -83,6 +84,7 @@ func runBuild(cmd *command) (err error) {
 // runBuildImpl builds a package for mobiles based on the given commands.
 // runBuildImpl returns a built package information and an error if exists.
 func runBuildImpl(cmd *command) (*packages.Package, error) {
+	klog.KLog.Info("runBuildImpl()")
 	cleanup, err := buildEnvInit()
 	if err != nil {
 		return nil, err
@@ -392,7 +394,8 @@ func parseBuildTarget(buildTarget string) ([]targetInfo, error) {
 		} else if isApplePlatform(platform) {
 			isApple = true
 		} else if isLinuxPlatform(platform) {
-		}  else {
+		} else if isWindowsPlatform(platform) {
+		} else {
 			return nil, fmt.Errorf("unsupported platform: %q", platform)
 		}
 		if isAndroid && isApple {

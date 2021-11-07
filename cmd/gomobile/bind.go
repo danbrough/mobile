@@ -93,6 +93,8 @@ func runBind(cmd *command) error {
 		}
 
 	} else if isLinuxPlatform(targets[0].platform) {
+	} else if isWindowsPlatform(targets[0].platform) {
+		klog.KLog.Debug("building for windows")
 	} else {
 		if bindJavaPkg != "" {
 			return fmt.Errorf("-javapkg is supported only for android target")
@@ -132,6 +134,8 @@ func runBind(cmd *command) error {
 		return goAndroidBind(gobind, pkgs, targets)
 	case isLinuxPlatform(targets[0].platform):
 		return goLinuxBind(gobind, pkgs, targets)
+	case isWindowsPlatform(targets[0].platform):
+		return goWindowsBind(gobind, pkgs, targets)
 	case isApplePlatform(targets[0].platform):
 		if !xcodeAvailable() {
 			return fmt.Errorf("-target=%q requires Xcode", buildTarget)
@@ -231,7 +235,6 @@ func packagesConfig(t targetInfo) *packages.Config {
 	config := &packages.Config{}
 
 	config.Env = append(os.Environ(), "GOARCH="+t.arch, "GOOS="+platformOS(t.platform), "CGO_ENABLED=1")
-
 
 	// Add CGO_ENABLED=1 explicitly since Cgo is disabled when GOOS is different from host OS.
 

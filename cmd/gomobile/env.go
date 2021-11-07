@@ -32,6 +32,10 @@ func isLinuxPlatform(platform string) bool {
 	return platform == "linux"
 }
 
+func isWindowsPlatform(platform string) bool {
+	return platform == "windows"
+}
+
 func isApplePlatform(platform string) bool {
 	return contains(applePlatforms, platform)
 }
@@ -50,6 +54,8 @@ func platformArchs(platform string) []string {
 		return []string{"arm", "arm64", "386", "amd64"}
 	case "linux":
 		return []string{"arm", "arm64", "386", "amd64"}
+	case "windows":
+		return []string{"arm", "arm64", "386", "amd64"}
 	default:
 		panic(fmt.Sprintf("unexpected platform: %s", platform))
 	}
@@ -66,6 +72,8 @@ func platformOS(platform string) string {
 		return "android"
 	case "linux":
 		return "linux"
+	case "windows":
+		return "windows"
 	case "ios", "iossimulator":
 		return "ios"
 	case "macos", "maccatalyst":
@@ -83,6 +91,8 @@ func platformTags(platform string) []string {
 	switch platform {
 	case "android":
 		return []string{"android"}
+	case "windows":
+		return []string{"windows"}
 	case "linux":
 		return []string{"linux"}
 	case "ios", "iossimulator":
@@ -167,7 +177,7 @@ func buildEnvInit() (cleanup func(), err error) {
 
 func envInit() (err error) {
 	// Setup the cross-compiler environments.
-	klog.KLog.Info("envInit() buildTarget:%s",buildTarget)
+	klog.KLog.Info("envInit() buildTarget:%s", buildTarget)
 	/*	isAndroid := platformOS(t.platform) == "android"
 		klog.KLog.Trace("isAndroid: %t  buildTagsuseOpenssl: %t", isAndroid, useOpenssl)
 		if !useOpenssl {
@@ -211,7 +221,7 @@ func envInit() (err error) {
 			}
 
 			if useOpenssl && sslLibsDir != "" {
-				androidEnv[arch] = append(androidEnv[arch],"CGO_CFLAGS=-I" + sslLibsDir +"/" + toolchain.abi + "/include","CGO_LDFLAGS=-L" + sslLibsDir +"/" + toolchain.abi + "/lib")
+				androidEnv[arch] = append(androidEnv[arch], "CGO_CFLAGS=-I"+sslLibsDir+"/"+toolchain.abi+"/include", "CGO_LDFLAGS=-L"+sslLibsDir+"/"+toolchain.abi+"/lib")
 			}
 
 			if arch == "arm" {

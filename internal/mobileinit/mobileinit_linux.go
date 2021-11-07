@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:build linux && !android
-// +build linux,!android
+//go:build linux || windows && !android
+// +build linux,windows,!android
 
 package mobileinit
 
@@ -23,48 +23,44 @@ adb logcat GoLog:I *:S
 #include <string.h>
 */
 
-
 import "C"
 import (
-  "bufio"
-  "os"
-  "runtime"
+	"bufio"
+	"os"
+	"runtime"
 )
-
 
 var (
-  ctag = C.CString("GoLog")
-  // Store the writer end of the redirected stderr and stdout
-  // so that they are not garbage collected and closed.
-  stderr, stdout *os.File
+	ctag = C.CString("GoLog")
+	// Store the writer end of the redirected stderr and stdout
+	// so that they are not garbage collected and closed.
+	stderr, stdout *os.File
 )
-
 
 type infoWriter struct{}
 
 func (infoWriter) Write(p []byte) (n int, err error) {
-  println("%s: %s", ctag, string(p))
-  return len(p), nil
+	println("%s: %s", ctag, string(p))
+	return len(p), nil
 }
 
 func lineLog(f *os.File, priority C.int) {
-  const logSize = 1024 // matches android/log.h.
-  r := bufio.NewReaderSize(f, logSize)
-  for {
-    line, _, err := r.ReadLine()
-    str := string(line)
-    if err != nil {
-      str += " " + err.Error()
-    }
+	const logSize = 1024 // matches android/log.h.
+	r := bufio.NewReaderSize(f, logSize)
+	for {
+		line, _, err := r.ReadLine()
+		str := string(line)
+		if err != nil {
+			str += " " + err.Error()
+		}
 
-    println("%s: %s", ctag, str)
+		println("%s: %s", ctag, str)
 
-    if err != nil {
-      break
-    }
-  }
+		if err != nil {
+			break
+		}
+	}
 }
-
 
 /*
 func (infoWriter) Write(p []byte) (n int, err error) {
@@ -91,32 +87,32 @@ func lineLog(f *os.File, priority C.int) {
 		}
 	}
 }
- */
+*/
 func init() {
-  println("init() GOOS:", runtime.GOOS)
-/*  log.SetOutput(infoWriter{})
-  // android logcat includes all of log.LstdFlags
-  log.SetFlags(log.Flags() &^ log.LstdFlags)
+	println("init() GOOS:", runtime.GOOS)
+	/*  log.SetOutput(infoWriter{})
+	    // android logcat includes all of log.LstdFlags
+	    log.SetFlags(log.Flags() &^ log.LstdFlags)
 
-  r, w, err := os.Pipe()
-  if err != nil {
-    panic(err)
-  }
-  stderr = w
-  if err := syscall.Dup3(int(w.Fd()), int(os.Stderr.Fd()), 0); err != nil {
-    panic(err)
-  }
-  //go lineLog(r, C.ANDROID_LOG_ERROR)
-  go lineLog(r, 4)
+	    r, w, err := os.Pipe()
+	    if err != nil {
+	      panic(err)
+	    }
+	    stderr = w
+	    if err := syscall.Dup3(int(w.Fd()), int(os.Stderr.Fd()), 0); err != nil {
+	      panic(err)
+	    }
+	    //go lineLog(r, C.ANDROID_LOG_ERROR)
+	    go lineLog(r, 4)
 
-  r, w, err = os.Pipe()
-  if err != nil {
-    panic(err)
-  }
-  stdout = w
-  if err := syscall.Dup3(int(w.Fd()), int(os.Stdout.Fd()), 0); err != nil {
-    panic(err)
-  }
-  //go lineLog(r, C.ANDROID_LOG_INFO)
-  go lineLog(r, 6)*/
+	    r, w, err = os.Pipe()
+	    if err != nil {
+	      panic(err)
+	    }
+	    stdout = w
+	    if err := syscall.Dup3(int(w.Fd()), int(os.Stdout.Fd()), 0); err != nil {
+	      panic(err)
+	    }
+	    //go lineLog(r, C.ANDROID_LOG_INFO)
+	    go lineLog(r, 6)*/
 }
