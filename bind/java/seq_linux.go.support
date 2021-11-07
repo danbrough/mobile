@@ -3,8 +3,8 @@
 // license that can be found in the LICENSE file.
 
 
-//go:build linux windows android
-// +build linux windows android
+//go:build linux || windows || android
+// +build linux ,windows ,android
 
 package main
 
@@ -17,7 +17,7 @@ package main
 //#include <jni.h>
 //#include <stdint.h>
 //#include <stdlib.h>
-//#include "seq_linux.h"
+//#include "seq.h"
 import "C"
 import (
 	"unsafe"
