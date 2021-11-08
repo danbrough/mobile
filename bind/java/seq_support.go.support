@@ -3,8 +3,8 @@
 // license that can be found in the LICENSE file.
 
 
-//go:build windows
-// +build windows
+//go:build linux || windows || android
+// +build windows linux android
 
 package main
 
