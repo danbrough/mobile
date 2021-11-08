@@ -182,6 +182,9 @@ func genPkgH(w io.Writer, pname string) {
 #ifdef __GOBIND_LINUX__
 #include "%[1]s_support.h"
 #endif
+#ifdef __GOBIND_WINDOWS__
+#include "%[1]s_support.h"
+#endif
 #endif
 #ifdef __GOBIND_DARWIN__
 #include "%[1]s_darwin.h"

@@ -1718,7 +1718,7 @@ import go.Seq;
 #include <android/log.h>
 #endif 
 #include <stdint.h>
-#include "seq.h"
+#include "seq_support.h"
 #include "_cgo_export.h"
 `
 

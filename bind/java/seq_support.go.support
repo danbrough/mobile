@@ -3,8 +3,8 @@
 // license that can be found in the LICENSE file.
 
 
-//go:build linux || windows || android
-// +build linux ,windows ,android
+//go:build windows
+// +build windows
 
 package main
 
@@ -14,11 +14,10 @@ package main
 
 //#cgo CFLAGS: -Werror
 //#cgo android LDFLAGS: -llog
-//#cgo windows LDFLAGS: -llog
 //#include <jni.h>
 //#include <stdint.h>
 //#include <stdlib.h>
-//#include "seq.h"
+//#include "seq_support.h"
 import "C"
 import (
 	"unsafe"
