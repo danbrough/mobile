@@ -16,7 +16,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
-#include "seq.h"
+#include "seq_support.h"
 #include "_cgo_export.h"
 
 #define NULL_REFNUM 41

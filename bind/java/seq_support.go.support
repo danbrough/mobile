@@ -14,6 +14,7 @@ package main
 
 //#cgo CFLAGS: -Werror
 //#cgo android LDFLAGS: -llog
+//#cgo windows LDFLAGS: -llog
 //#include <jni.h>
 //#include <stdint.h>
 //#include <stdlib.h>
