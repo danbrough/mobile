@@ -1,7 +1,15 @@
 # GoMobileJvm  basic demo
 
+## Linux JVM
+see [jvm.sh](jvm.sh)
 
-see [build.sh](build.sh)
+## Win32
+
+see [windows.sh](windows.sh)
+
+## GoLang
+
+`go run main.go`
 
 
 
