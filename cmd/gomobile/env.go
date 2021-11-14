@@ -221,7 +221,9 @@ func envInit() (err error) {
 			}
 
 			if useOpenssl && sslLibsDir != "" {
-				androidEnv[arch] = append(androidEnv[arch], "CGO_CFLAGS=-I"+sslLibsDir+"/"+toolchain.abi+"/include", "CGO_LDFLAGS=-L"+sslLibsDir+"/"+toolchain.abi+"/lib")
+				sslDir := filepath.Join(sslLibsDir, buildTarget)
+				klog.KLog.Info("Using static openssl libs at: %s", buildTarget)
+				androidEnv[arch] = append(androidEnv[arch], "CGO_CFLAGS=-I"+filepath.Join(sslDir, "include"), "CGO_LDFLAGS=-L"+filepath.Join(sslDir,"lib"))
 			}
 
 			if arch == "arm" {
