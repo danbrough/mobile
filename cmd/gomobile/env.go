@@ -186,7 +186,7 @@ func envInit() (err error) {
 	*/
 	useOpenssl := stringInSlice("openssl", buildTags)
 	sslLibsDir := os.Getenv("OPENSSL_LIBS")
-	klog.KLog.Error("sslLibsDir: %s",sslLibsDir)
+	klog.KLog.Trace("sslLibsDir: %s",sslLibsDir)
 
 	if ndkRoot, err := ndkRoot(); err == nil {
 		androidEnv = make(map[string][]string)
