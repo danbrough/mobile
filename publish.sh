@@ -10,7 +10,7 @@ fi
 
 VERSION=$(($VERSION + 1))
 
-VERSION_NAME=`printf "v0.0.1" $VERSION`
+VERSION_NAME=`printf "v0.0.2-beta%02d" $VERSION`
 
 echo Creating release: '<'$VERSION_NAME'>'
 
