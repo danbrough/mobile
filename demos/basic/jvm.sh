@@ -4,6 +4,10 @@ cd $(dirname $0)
 
 
 
+export JAVA_HOME=/opt/jdk/openjdk11
+
+
+
 go run github.com/danbrough/mobile/cmd/gomobile bind -target=linux/amd64 -x -v -work -o build -tags=openssl \
   github.com/danbrough/mobile/demos/basic/hello || exit 1
 
