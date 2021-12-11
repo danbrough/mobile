@@ -38,7 +38,7 @@ func goWindowsBind(gobind string, pkgs []*packages.Package, targets []targetInfo
 
 	gcc := os.Getenv("CC")
 	if gcc == "" {
-		gcc = "/usr/bin/x86_64-w64-mingw32-cc"
+		gcc = "/usr/bin/x86_64-w64-mingw32-gcc"
 		klog.KLog.Warn("CC not set to mingw32 gcc. Using default: %s",gcc)
 	}
 	gpp := os.Getenv("CXX")
