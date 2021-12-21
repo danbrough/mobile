@@ -277,7 +277,8 @@ func (g *JavaGen) genStruct(s structInfo) {
 	}
 
 	doc := g.docs[n]
-	g.javadoc(doc.Doc())
+	//g.javadoc(doc.Doc())
+	g.javadoc(strings.ReplaceAll(doc.Doc(), "*", "(star)"))
 	g.Printf("public final class %s", n)
 	if jinf != nil {
 		if jinf.extends != nil {
