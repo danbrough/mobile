@@ -6,9 +6,10 @@ cd $(dirname $0)
 
 export JAVA_HOME=/opt/jdk/openjdk11
 
+GOMOBILE="go run github.com/danbrough/mobile/cmd/gomobile"
+GOMOBILE=gomobile
 
-
-go run github.com/danbrough/mobile/cmd/gomobile bind -target=linux/amd64 -x -v -work -o build -tags=openssl \
+$GOMOBILE bind -target=linux/amd64 -x -v -o build -tags=openssl \
   github.com/danbrough/mobile/demos/basic/hello || exit 1
 
 CLASSPATH=build:build/hello.jar
